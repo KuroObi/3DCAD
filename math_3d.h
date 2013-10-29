@@ -30,37 +30,30 @@
 #define ToRadian(x) (float)(((x) * M_PI / 180.0f))
 #define ToDegree(x) (float)(((x) * 180.0f / M_PI))
 
-struct Vector2i
-{
+struct Vector2i{
     int x;
     int y;
 };
 
-struct Vector2f
-{
+struct Vector2f{
     float x;
     float y;
 
-    Vector2f()
-    {
+    Vector2f(){
     }
 
-    Vector2f(float _x, float _y)
-    {
+    Vector2f(float _x, float _y){
         x = _x;
         y = _y;
     }
 };
 
-
-struct Vector3f
-{
+struct Vector3f{
     float x;
     float y;
     float z;
 
-    Vector3f()
-    {
+    Vector3f(){
     }
 
     Vector3f(float _x, float _y, float _z)
@@ -138,45 +131,41 @@ inline Vector3f operator*(const Vector3f& l, float f)
 }
 
 
-class Matrix4f
-{
-public:
-    float m[4][4];
+class Matrix4f{
+	public:
+		float m[4][4];
 
-    Matrix4f()
-    {        
-    }
+		Matrix4f(){        
+		}
 
 
-    inline void InitIdentity()
-    {
-        m[0][0] = 1.0f; m[0][1] = 0.0f; m[0][2] = 0.0f; m[0][3] = 0.0f;
-        m[1][0] = 0.0f; m[1][1] = 1.0f; m[1][2] = 0.0f; m[1][3] = 0.0f;
-        m[2][0] = 0.0f; m[2][1] = 0.0f; m[2][2] = 1.0f; m[2][3] = 0.0f;
-        m[3][0] = 0.0f; m[3][1] = 0.0f; m[3][2] = 0.0f; m[3][3] = 1.0f;
-    }
+		inline void InitIdentity(){
+			m[0][0] = 1.0f; m[0][1] = 0.0f; m[0][2] = 0.0f; m[0][3] = 0.0f;
+			m[1][0] = 0.0f; m[1][1] = 1.0f; m[1][2] = 0.0f; m[1][3] = 0.0f;
+			m[2][0] = 0.0f; m[2][1] = 0.0f; m[2][2] = 1.0f; m[2][3] = 0.0f;
+			m[3][0] = 0.0f; m[3][1] = 0.0f; m[3][2] = 0.0f; m[3][3] = 1.0f;
+		}
 
-    inline Matrix4f operator*(const Matrix4f& Right) const
-    {
-        Matrix4f Ret;
+		inline Matrix4f operator*(const Matrix4f& Right) const{
+			Matrix4f Ret;
 
-        for (unsigned int i = 0 ; i < 4 ; i++) {
-            for (unsigned int j = 0 ; j < 4 ; j++) {
-                Ret.m[i][j] = m[i][0] * Right.m[0][j] +
-                              m[i][1] * Right.m[1][j] +
-                              m[i][2] * Right.m[2][j] +
-                              m[i][3] * Right.m[3][j];
-            }
-        }
+			for (unsigned int i = 0 ; i < 4 ; i++){
+				for (unsigned int j = 0 ; j < 4 ; j++){
+					Ret.m[i][j] = m[i][0] * Right.m[0][j] +
+								  m[i][1] * Right.m[1][j] +
+								  m[i][2] * Right.m[2][j] +
+								  m[i][3] * Right.m[3][j];
+				}
+			}
 
-        return Ret;
-    }
+			return Ret;
+		}
 
-    void InitScaleTransform(float ScaleX, float ScaleY, float ScaleZ);
-    void InitRotateTransform(float RotateX, float RotateY, float RotateZ);
-    void InitTranslationTransform(float x, float y, float z);
-    void InitCameraTransform(const Vector3f& Target, const Vector3f& Up);
-    void InitPersProjTransform(float FOV, float Width, float Height, float zNear, float zFar);
+		void InitScaleTransform(float ScaleX, float ScaleY, float ScaleZ);
+		void InitRotateTransform(float RotateX, float RotateY, float RotateZ);
+		void InitTranslationTransform(float x, float y, float z);
+		void InitCameraTransform(const Vector3f& Target, const Vector3f& Up);
+		void InitPersProjTransform(float FOV, float Width, float Height, float zNear, float zFar);
 };
 
 

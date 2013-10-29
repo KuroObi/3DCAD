@@ -19,8 +19,7 @@
 #include "pipeline.h"
 
 
-const Matrix4f& Pipeline::GetTrans()
-{
+const Matrix4f& Pipeline::GetTrans(){
     Matrix4f ScaleTrans, RotateTrans, TranslationTrans, CameraTranslationTrans, CameraRotateTrans, PersProjTrans;
 
     ScaleTrans.InitScaleTransform(m_scale.x, m_scale.y, m_scale.z);

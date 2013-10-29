@@ -118,7 +118,7 @@ class AngTest : public ICallbacks{
 			p.SetPerspectiveProj(60.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 100.0f);
 	        
 			
-			if (m_leftMouseButton.IsPressed) {
+			if (m_leftMouseButton.IsPressed){ // #TODO: simplyfiy
 				
 				float xx = (((float)m_leftMouseButton.x)/((float)WINDOW_WIDTH) - 0.5) * 2;
 				float yy = (((float)m_leftMouseButton.y)/((float)WINDOW_HEIGHT) - 0.5) * -2;
@@ -206,8 +206,8 @@ class AngTest : public ICallbacks{
 
 
 		virtual void KeyboardCB(unsigned char Key, int x, int y){
-			switch (Key) {
-				case 'q': {
+			switch (Key){
+				case 'q':{
 					exit(0);
 					break;
 				}
@@ -319,7 +319,7 @@ class AngTest : public ICallbacks{
 
 
 	//Variables
-		struct {
+		struct{
 			bool IsPressed;
 			int x;
 			int y;

@@ -14,9 +14,7 @@ bool ObjectManager::OnMouse(int button, float x, float y){
 	//printf("button: %d (%f / %f)\n",button,x,y);
     
 	switch (button) {
-
-    case 0:
-        {
+		case 0:{
 			generateQuad(x, y, 0, x+0.2, y+0.2, 0);
 			Ret = true;
         }

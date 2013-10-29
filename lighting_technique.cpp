@@ -73,29 +73,23 @@ void main()                                                                     
 }";
 
 
-LightingTechnique::LightingTechnique()
-{   
+LightingTechnique::LightingTechnique(){   
 }
 
-bool LightingTechnique::Init()
-{
-    if (!Technique::Init())
-    {
+bool LightingTechnique::Init(){
+    if (!Technique::Init()){
         return false;
     }
 
-    if (!AddShader(GL_VERTEX_SHADER, pVS))
-    {
+    if (!AddShader(GL_VERTEX_SHADER, pVS)){
         return false;
     }
 
-    if (!AddShader(GL_FRAGMENT_SHADER, pFS))
-    {
+    if (!AddShader(GL_FRAGMENT_SHADER, pFS)){
         return false;
     }
 
-    if (!Finalize())
-    {
+    if (!Finalize()){
         return false;
     }
 
@@ -105,21 +99,18 @@ bool LightingTechnique::Init()
 
     if (m_dirLightAmbientIntensityLocation == 0xFFFFFFFF ||
         m_WVPLocation == 0xFFFFFFFF ||
-        m_dirLightColorLocation == 0xFFFFFFFF)
-    {
+        m_dirLightColorLocation == 0xFFFFFFFF){
         return false;
     }
 
     return true;
 }
 
-void LightingTechnique::SetWVP(const Matrix4f& WVP)
-{
+void LightingTechnique::SetWVP(const Matrix4f& WVP){
     glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);    
 }
 
-void LightingTechnique::SetDirectionalLight(const DirectionalLight& Light)
-{
+void LightingTechnique::SetDirectionalLight(const DirectionalLight& Light){
     glUniform3f(m_dirLightColorLocation, Light.Color.x, Light.Color.y, Light.Color.z);
     glUniform1f(m_dirLightAmbientIntensityLocation, Light.AmbientIntensity);
 }

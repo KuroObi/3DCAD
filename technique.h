@@ -22,8 +22,7 @@
 #include <list>
 #include <GL/glew.h>
 
-class Technique
-{
+class Technique{
 public:
 
     Technique();
@@ -52,4 +51,3 @@ private:
 
 
 #endif	/* TECHNIQUE_H */
-

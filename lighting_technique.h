@@ -22,28 +22,26 @@
 #include "technique.h"
 #include "math_3d.h"
 
-struct DirectionalLight
-{
+struct DirectionalLight{
     Vector3f Color;
     float AmbientIntensity;
 };
 
-class LightingTechnique : public Technique
-{
-public:
+class LightingTechnique : public Technique{
+	public:
 
-    LightingTechnique();
+		LightingTechnique();
 
-    virtual bool Init();
+		virtual bool Init();
 
-    void SetWVP(const Matrix4f& WVP);
-    void SetDirectionalLight(const DirectionalLight& Light);
+		void SetWVP(const Matrix4f& WVP);
+		void SetDirectionalLight(const DirectionalLight& Light);
 
-private:
+	private:
 
-    GLuint m_WVPLocation;
-    GLuint m_dirLightColorLocation;
-    GLuint m_dirLightAmbientIntensityLocation;
+		GLuint m_WVPLocation;
+		GLuint m_dirLightColorLocation;
+		GLuint m_dirLightAmbientIntensityLocation;
 };
 
 

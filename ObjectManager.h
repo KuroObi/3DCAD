@@ -16,6 +16,7 @@ struct Vertex{
 		y = _y;
 		z = _z;
 	}
+
 	Vector3f getVector3f(){
 		return Vector3f(x,y,z);
 	}
@@ -32,6 +33,7 @@ struct Triangle{
 		vertex[2] = Vertex(0.0f, 0.0f, 0.0f);
 		nextTriangle = NULL;
 	}
+
 	Triangle(float c_x1, float c_y1, float c_z1,float c_x2, float c_y2, float c_z2,float c_x3, float c_y3, float c_z3){
 		vertex[0] = Vertex(c_x1, c_y1, c_z1);
 		vertex[1] = Vertex(c_x2, c_y2, c_z2);
@@ -50,6 +52,7 @@ struct Line{
 		vertex[1] = Vertex(1.0f, 0.0f, 0.0f);
 		nextLine = NULL;
 	}
+
 	Line(float c_x1, float c_y1, float c_z1,float c_x2, float c_y2, float c_z2){
 		vertex[0] = Vertex(c_x1, c_y1, c_z1);
 		vertex[1] = Vertex(c_x2, c_y2, c_z2);
@@ -66,6 +69,7 @@ struct Point{
 		vertex[0] = Vertex(0.0f, 0.0f, 0.0f);
 		nextPoint = NULL;
 	}
+
 	Point(float c_x1, float c_y1, float c_z1){
 		vertex[0] = Vertex(c_x1, c_y1, c_z1);
 		nextPoint = NULL;	
@@ -98,6 +102,7 @@ struct World{
 		startTriangle = Triangle();
 		HeadTriangle = &startTriangle;
 	}
+
 	void addPoint(Point * newPoint){
 		Point * nextPoint = new Point;
 		
@@ -108,6 +113,7 @@ struct World{
 		numberOfPoints++;
 		return;
 	};
+
 	void addLine(Line * newLine){
 		Line * nextLine = new Line;
 		
@@ -118,6 +124,7 @@ struct World{
 		numberOfLines++;
 		return;
 	};
+
 	void addTriangle(Triangle * newTriangle){
 		Triangle * nextTriangle = new Triangle;
 		

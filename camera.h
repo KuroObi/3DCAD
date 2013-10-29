@@ -22,66 +22,62 @@
 #include "math_3d.h"
 
 
-class Camera
-{
-public:
+class Camera{
+	public:
 
-    Camera(int WindowWidth, int WindowHeight, float EyeDistanz);
+		Camera(int WindowWidth, int WindowHeight, float EyeDistanz);
 
-    Camera(int WindowWidth, int WindowHeight, const Vector3f& Pos, const Vector3f& Target, const Vector3f& Up, float EyeDistanz);
+		Camera(int WindowWidth, int WindowHeight, const Vector3f& Pos, const Vector3f& Target, const Vector3f& Up, float EyeDistanz);
 
-    bool OnKeyboard(int Key);
+		bool OnKeyboard(int Key);
 
-    void OnMouse(int x, int y);
+		void OnMouse(int x, int y);
 
-    void OnRender();
+		void OnRender();
 
-    const Vector3f& GetPos() const
-    {
-        return m_pos;
-    }
+		const Vector3f& GetPos() const{
+			return m_pos;
+		}
 
-    const Vector3f& GetTarget() const
-    {
-        return m_target;
-    }
+		const Vector3f& GetTarget() const{
+			return m_target;
+		}
 
-    const Vector3f& GetUp() const
-    {
-        return m_up;
-    }
+		const Vector3f& GetUp() const{
+			return m_up;
+		}
 	
-	float leftEye();
+		float leftEye();
 
-	float rightEye();
+		float rightEye();
 
-	float m_AngleH;
-    float m_AngleV;
+		float m_AngleH;
+		float m_AngleV;
 
-private:
+	private:
 
-    void Init();
-    void Update();
+		void Init();
+		void Update();
 
-    Vector3f m_pos;
-    Vector3f m_target;
-    Vector3f m_up;
+		Vector3f m_pos;
+		Vector3f m_target;
+		Vector3f m_up;
 
-    int m_windowWidth;
-    int m_windowHeight;
+		int m_windowWidth;
+		int m_windowHeight;
 
-	float m_EyeStep;
+		float m_EyeStep;
 
-	//float m_AngleH;
-    //float m_AngleV;
+		//float m_AngleH;
+		//float m_AngleV;
 	
-    bool m_OnUpperEdge;
-    bool m_OnLowerEdge;
-    bool m_OnLeftEdge;
-    bool m_OnRightEdge;
+		bool m_OnUpperEdge;
+		bool m_OnLowerEdge;
+		bool m_OnLeftEdge;
+		bool m_OnRightEdge;
 
-    Vector2i m_mousePos;
-};
+		Vector2i m_mousePos;
+	};
 
 #endif	/* CAMERA_H */
 
