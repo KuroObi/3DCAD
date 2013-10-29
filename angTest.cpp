@@ -28,6 +28,7 @@
 #include "pipeline.h"
 #include "camera.h"
 #include "ObjectManager.h"
+#include "UI.h"
 #include "lighting_technique.h"
 #include "glut_backend.h"
 
@@ -42,7 +43,7 @@ class AngTest : public ICallbacks{
 		    m_directionalLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
 		    m_directionalLight.AmbientIntensity = 1.0f;	
 
-			m_leftMouseButton.IsPressed = false;
+			
 		}
 		
 		~AngTest(){
@@ -57,6 +58,7 @@ class AngTest : public ICallbacks{
 			Vector3f Target(0.0f, -0.2f, 1.0f);
 			Vector3f Up(0.0, 0.0f, 0.0f);
 
+			worldPos = Vector3f(0.0f, 0.0f, 3.0f);
 			m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, 0.05f);
 
 			//genratePyramid(0.0f); //Dummy
@@ -76,7 +78,7 @@ class AngTest : public ICallbacks{
 
 			m_pEffect->Enable();
 			
-			stereo = true;
+			stereo = false;
 			turnAround = false;
 
 			return true;
@@ -114,42 +116,12 @@ class AngTest : public ICallbacks{
 			p.Rotate(0.0f, Scale, 0.0f);
 			p.WorldPos(0.0f, -0.0f, 3.0f);
 
+			//p.WorldPos(worldPos.x, worldPos.y, worldPos.z);
+
 			p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
 			p.SetPerspectiveProj(60.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 100.0f);
 	        
 			
-			if (m_leftMouseButton.IsPressed){ // #TODO: simplyfiy
-				
-				float xx = (((float)m_leftMouseButton.x)/((float)WINDOW_WIDTH) - 0.5) * 2;
-				float yy = (((float)m_leftMouseButton.y)/((float)WINDOW_HEIGHT) - 0.5) * -2;
-				
-				float angleA = m_pGameCamera->m_AngleH*(M_PI/180) + (xx*45)*(M_PI/180);
-				float angleB = -m_pGameCamera->m_AngleV*(M_PI/180) + (yy*30)*(M_PI/180);
-	
-				Vector3f vp = m_pGameCamera->GetPos() -  p.getWorldPos();
-	
-				Vector3f v(1.5f, 0.0f, 0.0f);
-
-				float _x = cosf(angleA)*v.x + sinf(angleA)*v.z;
-				float _y = v.y;
-				float _z = -sinf(angleA)*v.x - cosf(angleA)*v.z;
-			
-				float __x = _x;
-				float __y = cosf(angleB)*_y + sinf(angleB)*_z;
-				float __z = sinf(angleB)*_y + cosf(angleB)*_z;
-
-				float f_x = __x+vp.x;
-				float f_y = __y+vp.y;
-				float f_z = __z+vp.z;
-				
-				m_pGameCamera->GetUp().Print();
-
-				m_oManager.genarateSquare(f_x-0.05,f_y-0.05,f_z, f_x+0.05,f_y-0.05,f_z, f_x+0.05,f_y+0.05,f_z);
-
-				CreateVertexBuffer();
-
-				m_leftMouseButton.IsPressed = false;
-			}
         
 
 			m_pEffect->SetWVP(p.GetTrans());
@@ -220,12 +192,38 @@ class AngTest : public ICallbacks{
 		}
 
 		virtual void MouseCB(int Button, int State, int x, int y){
-        if (Button == GLUT_LEFT_BUTTON) {
-            m_leftMouseButton.IsPressed = (State == GLUT_DOWN);
-            m_leftMouseButton.x = x;
-            m_leftMouseButton.y = y;
-        }
-    }
+			if (Button == GLUT_LEFT_BUTTON) {
+				
+				m_UI.draw(calcWorldPos(x, y), &m_oManager);
+
+				CreateVertexBuffer();
+				State = GLUT_UP;
+			}
+		}
+
+		Vector3f calcWorldPos(int x, int y){
+			float angleA = (((float)x)/((float)WINDOW_WIDTH) - 0.5f) * 2.0f;
+			float angleB = (((float)y)/((float)WINDOW_HEIGHT) - 0.5f) * -2.0f;
+		
+			float pi = (float) M_PI;
+
+			angleA = m_pGameCamera->m_AngleH*(pi/180.0f) + (angleA*45.0f)*(pi/180.0f);
+			angleB = m_pGameCamera->m_AngleV*(pi/180.0f) + (angleB*60.0f)*(pi/180.0f);
+				
+			Vector3f vp = m_pGameCamera->GetPos() - worldPos;
+
+			Vector3f v(1.5f, 0.0f, 0.0f);
+
+			float _x = cosf(angleA)*v.x + sinf(angleA)*v.z;
+			float _y = v.y;
+			float _z = -sinf(angleA)*v.x - cosf(angleA)*v.z;
+			
+			_x = _x + vp.x;
+			_y = cosf(angleB)*_y + sinf(angleB)*_z + vp.y;
+			_z = -sinf(angleB)*_y + cosf(angleB)*_z + vp.z;
+			return Vector3f(_x, _y, _z);
+		}
+
 
 	private:
 
@@ -319,12 +317,6 @@ class AngTest : public ICallbacks{
 
 
 	//Variables
-		struct{
-			bool IsPressed;
-			int x;
-			int y;
-		}m_leftMouseButton;
-
 	    GLuint m_VBO;
 		GLuint m_IBO;
 		LightingTechnique* m_pEffect;
@@ -333,9 +325,12 @@ class AngTest : public ICallbacks{
 		DirectionalLight m_directionalLight;
 		
 		ObjectManager m_oManager;
+		UI m_UI;
 		
 		bool stereo;
 		bool turnAround;
+
+		Vector3f worldPos;
 
 };
 

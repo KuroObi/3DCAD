@@ -94,6 +94,8 @@ struct Vector3f{
 
     Vector3f& Normalize();
 
+	float Dist(Vector3f& v);
+
     void Rotate(float Angle, const Vector3f& Axis);
 
     void Print() const

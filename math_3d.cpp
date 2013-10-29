@@ -35,6 +35,10 @@ Vector3f& Vector3f::Normalize(){
 
     return *this;
 }
+float Vector3f::Dist(Vector3f& v){
+	return sqrtf( (x-v.x)*(x-v.x) + (y-v.y)*(y-v.y) + (z-v.z)*(z-v.z) );
+}
+
 
 void Vector3f::Rotate(float Angle, const Vector3f& Axe){
     const float SinHalfAngle = sinf(ToRadian(Angle/2));

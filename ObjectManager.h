@@ -5,20 +5,24 @@
 #include "math_3d.h"
 
 struct Vertex{
-	float x,y,z;
-	float u,v;
+	Vector3f xyz;
+	Vector2f uv;
 	
 	Vertex(){
 	};
 
+	Vertex(Vector3f _Vertex){
+		xyz = _Vertex;
+	}
+
 	Vertex(float _x, float _y, float _z){
-		x = _x;
-		y = _y;
-		z = _z;
+		xyz.x = _x;
+		xyz.y = _y;
+		xyz.z = _z;
 	}
 
 	Vector3f getVector3f(){
-		return Vector3f(x,y,z);
+		return xyz;
 	}
 };
 
@@ -53,6 +57,11 @@ struct Line{
 		nextLine = NULL;
 	}
 
+	Line(Vector3f _vertex1, Vector3f _vertex2){
+		vertex[0] = _vertex1;
+		vertex[1] = _vertex2;
+	}
+
 	Line(float c_x1, float c_y1, float c_z1,float c_x2, float c_y2, float c_z2){
 		vertex[0] = Vertex(c_x1, c_y1, c_z1);
 		vertex[1] = Vertex(c_x2, c_y2, c_z2);
@@ -68,6 +77,10 @@ struct Point{
 	Point(){
 		vertex[0] = Vertex(0.0f, 0.0f, 0.0f);
 		nextPoint = NULL;
+	}
+
+	Point(Vector3f _vertex){
+		vertex[0] = _vertex;
 	}
 
 	Point(float c_x1, float c_y1, float c_z1){
@@ -152,7 +165,8 @@ public:
 	void genaratePoint(float c_x1, float c_y1, float c_z1);
 
 	void genarateLine(float c_x1, float c_y1, float c_z1,float c_x2, float c_y2, float c_z2);
-	
+	void genarateLine(Vector3f _vertex1, Vector3f _vertex2);
+
 	void genarateTriangle(float c_x1, float c_y1, float c_z1,float c_x2, float c_y2, float c_z2,float c_x3, float c_y3, float c_z3);
 
 	//void genarateSquare(float c_x0, float c_y0, float c_z0, float c_x1, float c_y1, float c_z1);

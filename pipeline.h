@@ -39,6 +39,12 @@ class Pipeline{
 			m_worldPos.y = y;
 			m_worldPos.z = z;
 		}
+
+		void WorldPos(Vector3f _WorldPos){
+			m_worldPos.x = _WorldPos.x;
+			m_worldPos.y = _WorldPos.y;
+			m_worldPos.z = _WorldPos.z;
+		}
 	
 		void Rotate(float RotateX, float RotateY, float RotateZ){
 			m_rotateInfo.x = RotateX;
