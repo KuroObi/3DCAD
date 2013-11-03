@@ -31,6 +31,7 @@
 #include "UI.h"
 #include "lighting_technique.h"
 #include "glut_backend.h"
+#include "gui.h"
 
 #define WINDOW_WIDTH  1600
 #define WINDOW_HEIGHT 900
@@ -77,9 +78,11 @@ class AngTest : public ICallbacks{
 			}
 
 			m_pEffect->Enable();
-			
+	
 			stereo = false;
 			turnAround = false;
+
+			initGUI();
 
 			return true;
 		}
@@ -91,14 +94,30 @@ class AngTest : public ICallbacks{
 		virtual void RenderSceneCB(){
 			m_pGameCamera->OnRender();
 			
-			MousePhase();
+			m_pEffect->setboolGUI(0);
 			RenderPhase();
+			
+			m_pEffect->setboolGUI(1);
+			GuiPhase();
+
+			m_pEffect->setboolGUI(2);
+			MousePhase(); //still unsed
 			
 			glutSwapBuffers();
 		}
 
 		void MousePhase(){
 		
+		}
+
+		void GuiPhase(){
+			glEnableVertexAttribArray(0);
+			glBindBuffer(GL_ARRAY_BUFFER, m_guiVBO);
+
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			glDrawArrays(GL_QUADS, 0,m_gui.numOfButtons * 4); // count => make dynamic
+			
+			glDisableVertexAttribArray(0);
 		}
 
 		void RenderPhase(){
@@ -116,14 +135,9 @@ class AngTest : public ICallbacks{
 			p.Rotate(0.0f, Scale, 0.0f);
 			p.WorldPos(0.0f, -0.0f, 3.0f);
 
-			//p.WorldPos(worldPos.x, worldPos.y, worldPos.z);
-
 			p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
 			p.SetPerspectiveProj(60.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 100.0f);
 	        
-			
-        
-
 			m_pEffect->SetWVP(p.GetTrans());
 			m_pEffect->SetDirectionalLight(m_directionalLight);
 		
@@ -194,21 +208,49 @@ class AngTest : public ICallbacks{
 		virtual void MouseCB(int Button, int State, int x, int y){
 			if (Button == GLUT_LEFT_BUTTON) {
 				
-				m_UI.draw(calcWorldPos(x, y), &m_oManager);
+				if(State == GLUT_DOWN){
+					float relativ_x = (((float)x)/((float)WINDOW_WIDTH) - 0.5f) * 2.0f;
+					float relativ_y = (((float)y)/((float)WINDOW_HEIGHT) - 0.5f) * -2.0f;
+		
+					switch(m_gui.buttonCB(relativ_x, relativ_y)){
+						case NEW:
+							m_oManager = ObjectManager();
+							m_UI = UI();
+							break;
+						case QUIT:
+							exit(0);
+							break;
+						case POI:
+							m_UI.changeDrawT(tPOINT);
+							break;
+						case LINE:
+							m_UI.changeDrawT(tLINE);
+							break;
+						case TRI:
+							m_UI.changeDrawT(tTRI);
+							break;
+						case QAD:
+							m_UI.changeDrawT(tQUAD);
+							break;
+						case NOTHING:
+							m_UI.draw(calcWorldPos(relativ_x, relativ_y), &m_oManager);
+					}
+					
 
-				CreateVertexBuffer();
-				State = GLUT_UP;
+
+					
+					CreateVertexBuffer();
+					State = GLUT_UP;
+				}
 			}
 		}
 
-		Vector3f calcWorldPos(int x, int y){
-			float angleA = (((float)x)/((float)WINDOW_WIDTH) - 0.5f) * 2.0f;
-			float angleB = (((float)y)/((float)WINDOW_HEIGHT) - 0.5f) * -2.0f;
-		
+		Vector3f calcWorldPos(float x, float y){
+			
 			float pi = (float) M_PI;
 
-			angleA = m_pGameCamera->m_AngleH*(pi/180.0f) + (angleA*45.0f)*(pi/180.0f);
-			angleB = m_pGameCamera->m_AngleV*(pi/180.0f) + (angleB*60.0f)*(pi/180.0f);
+			float angleA = m_pGameCamera->m_AngleH*(pi/180.0f) + (x*45.0f)*(pi/180.0f);
+			float angleB = m_pGameCamera->m_AngleV*(pi/180.0f) + (y*60.0f)*(pi/180.0f);
 				
 			Vector3f vp = m_pGameCamera->GetPos() - worldPos;
 
@@ -227,12 +269,32 @@ class AngTest : public ICallbacks{
 
 	private:
 
+		void initGUI(){
+
+			m_gui.init();
+			int numberOfButtons = m_gui.numOfButtons;
+			int sizeVertices = numberOfButtons* 4 * 12;
+			Vector3f * guiVert;
+			guiVert = new Vector3f[numberOfButtons * 4];
+
+			for(int c = 0; c < numberOfButtons; c++){
+				for(int v = 0; v < 4 ; v++){
+					guiVert[c*4 + v] = m_gui.button[c].vertex[v].getVector3f();
+				}
+			}
+						
+			glGenBuffers(1, &m_guiVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, m_guiVBO);
+			glBufferData(GL_ARRAY_BUFFER, sizeVertices, guiVert, GL_STATIC_DRAW);
+
+		}
+
 		void CreateVertexBuffer(){
 			int numPoi = m_oManager.sector.numberOfPoints;
 			int numLi = m_oManager.sector.numberOfLines;
 			int numTri = m_oManager.sector.numberOfTriangles;
 			int cVertes = 0;
-			int sizeVertices = (numPoi + numLi*2 + numTri*3)*12;
+			int sizeVertices = (numPoi + numLi*2 + numTri*3) * 12;
 
 			Vector3f * Vertices;
 			Vertices = new Vector3f[numPoi + numLi*2 + numTri*3];
@@ -270,54 +332,16 @@ class AngTest : public ICallbacks{
 					thisTriangle = thisTriangle->nextTriangle;
 				}
 			}	
+
 			glGenBuffers(1, &m_VBO);
 			glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 			glBufferData(GL_ARRAY_BUFFER, sizeVertices, Vertices, GL_DYNAMIC_DRAW);
 		}
-
 		
-		//Dummy
-		void genratePyramid(float xVer){
-			m_oManager.genarateTriangle(-1.0f+xVer, -1.0f, 0.5773f,
-									0.0f+xVer, 1.0f, 0.0f,
-									0.0f+xVer, -1.0f, -1.15475f);
-
-			m_oManager.genarateTriangle(0.0f+xVer, -1.0f, -1.15475f,
-									0.0f+xVer, 1.0f, 0.0f,
-									1.0f+xVer, -1.0f, 0.5773f);
-
-			m_oManager.genarateTriangle(1.0f+xVer, -1.0f, 0.5773f,
-									0.0f+xVer, 1.0f, 0.0f,
-									-1.0f+xVer, -1.0f, 0.5773f);
-
-			m_oManager.genarateTriangle(-1.0f+xVer, -1.0f, 0.5773f,
-									1.0f+xVer, -1.0f, 0.5773f,
-									0.0f+xVer, -1.0f, -1.15475f);
-
-			printf("Piramid generated! With xVer: %f\n",xVer);
-		}
-		void generateRandomPoints(int count, int range){
-			int x,y,z;
-			int con1 = (range*200)+1, con2 = range*100;
-			for(int c = 1; c <= count;c++){
-				x = rand()%con1-con2; y = rand()%con1-con2; z = rand()%con1-con2;
-				m_oManager.genaratePoint(x*0.01f, y*0.01f, z*0.01f);
-			}
-		}
-
-		void generateTestBLA(){
-			//m_oManager.generateQuad(0.0f, 0.0f, 0.0f, 0.5f, -0.7f, 0.5f, 1.0f, 0.0f, 1.0f);
-			m_oManager.generateQuad(-1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f);
-			//m_oManager.genarateSquare(0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f);
-			//m_oManager.genarateTriangle(0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f);
-			
-			//m_oManager.genarateTriangle(0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f);
-			//m_oManager.genarateTriangle(0.0f, 0.0f, 0.0f, 0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 1.0f);
-		}
-
-
 	//Variables
 	    GLuint m_VBO;
+		GLuint m_guiVBO;
+
 		GLuint m_IBO;
 		LightingTechnique* m_pEffect;
         Camera* m_pGameCamera;
@@ -326,73 +350,18 @@ class AngTest : public ICallbacks{
 		
 		ObjectManager m_oManager;
 		UI m_UI;
-		
+		gui m_gui;
+
 		bool stereo;
 		bool turnAround;
 
 		Vector3f worldPos;
-
 };
-
-/* #TODO: Update VertexBuffer --to--> IndexBuffer
-
-static void CreateVertexBuffer()
-{
-    Vector3f Vertices[4];
-    Vertices[0] = Vector3f(-1.0f, -1.0f, 0.5773f);
-    Vertices[1] = Vector3f(0.0f, -1.0f, -1.15475f);
-    Vertices[2] = Vector3f(1.0f, -1.0f, 0.5773f);
-    Vertices[3] = Vector3f(0.0f, 1.0f, 0.0f);
-
- 	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
-}
-
-static void CreateIndexBuffer()
-{
-    unsigned int Indices[] = { 0, 3, 1,
-                               1, 3, 2,
-                               2, 3, 0,
-                               0, 2, 1 };
-
-    glGenBuffers(1, &IBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
-}
-
-static void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
-{
-    GLuint ShaderObj = glCreateShader(ShaderType);
-
-    if (ShaderObj == 0) {
-        fprintf(stderr, "Error creating shader type %d\n", ShaderType);
-        exit(0);
-    }
-
-    const GLchar* p[1];
-    p[0] = pShaderText;
-    GLint Lengths[1];
-    Lengths[0]= strlen(pShaderText);
-    glShaderSource(ShaderObj, 1, p, Lengths);
-    glCompileShader(ShaderObj);
-    GLint success;
-    glGetShaderiv(ShaderObj, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        GLchar InfoLog[1024];
-        glGetShaderInfoLog(ShaderObj, 1024, NULL, InfoLog);
-        fprintf(stderr, "Error compiling shader type %d: '%s'\n", ShaderType, InfoLog);
-        exit(1);
-    }
-
-    glAttachShader(ShaderProgram, ShaderObj);
-}
-*/
 
 int main(int argc, char** argv){
     GLUTBackendInit(argc, argv);
 
-	bool fullScreen = false;
+	bool fullScreen = true;
 
 	if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 60, fullScreen, "AngTest")){
         return 1;

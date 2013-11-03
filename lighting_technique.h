@@ -36,12 +36,14 @@ class LightingTechnique : public Technique{
 
 		void SetWVP(const Matrix4f& WVP);
 		void SetDirectionalLight(const DirectionalLight& Light);
+		void setboolGUI(const bool _gui);
 
 	private:
 
 		GLuint m_WVPLocation;
 		GLuint m_dirLightColorLocation;
 		GLuint m_dirLightAmbientIntensityLocation;
+		GLuint m_boolGUILocation;
 };
 
 

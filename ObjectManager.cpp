@@ -30,6 +30,13 @@ void ObjectManager::genaratePoint(float c_x0, float c_y0, float c_z0){
 	sector.addPoint(generatetPoint);
 }
 
+void ObjectManager::genaratePoint(Vector3f _vertex0){	
+	Point * generatetPoint = new Point;
+
+	generatetPoint = new Point(_vertex0);
+	sector.addPoint(generatetPoint);
+}
+
 void ObjectManager::genarateLine(float c_x0, float c_y0, float c_z0, float c_x1, float c_y1, float c_z1){	
 	Line * generatetLine = new Line;
 
@@ -37,10 +44,10 @@ void ObjectManager::genarateLine(float c_x0, float c_y0, float c_z0, float c_x1,
 	sector.addLine(generatetLine);
 }
 
-void ObjectManager::genarateLine(Vector3f _vertex1, Vector3f _vertex2){	
+void ObjectManager::genarateLine(Vector3f _vertex0, Vector3f _vertex1){	
 	Line * generatetLine = new Line;
 
-	generatetLine = new Line(_vertex1, _vertex2);
+	generatetLine = new Line(_vertex0, _vertex1);
 	sector.addLine(generatetLine);
 }
 
@@ -48,6 +55,13 @@ void ObjectManager::genarateTriangle(float c_x0, float c_y0, float c_z0, float c
 	Triangle * generatedTriangle = new Triangle;
 
 	generatedTriangle = new Triangle(c_x0, c_y0, c_z0, c_x1, c_y1, c_z1, c_x2, c_y2, c_z2);
+	sector.addTriangle(generatedTriangle);
+}
+
+void ObjectManager::genarateTriangle(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex2){	
+	Triangle * generatedTriangle = new Triangle;
+
+	generatedTriangle = new Triangle(_vertex0, _vertex1, _vertex2);
 	sector.addTriangle(generatedTriangle);
 }
 

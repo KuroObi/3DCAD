@@ -26,23 +26,23 @@ struct Vertex{
 	}
 };
 
-struct Triangle{
-	Vertex  vertex[3];
+struct Point{
+	Vertex  vertex[1];
 
-	Triangle * nextTriangle;
+	Point * nextPoint;
 
-	Triangle(){
+	Point(){
 		vertex[0] = Vertex(0.0f, 0.0f, 0.0f);
-		vertex[1] = Vertex(0.0f, 0.0f, 0.0f);
-		vertex[2] = Vertex(0.0f, 0.0f, 0.0f);
-		nextTriangle = NULL;
+		nextPoint = NULL;
 	}
 
-	Triangle(float c_x1, float c_y1, float c_z1,float c_x2, float c_y2, float c_z2,float c_x3, float c_y3, float c_z3){
+	Point(Vector3f _vertex0){
+		vertex[0] = _vertex0;
+	}
+
+	Point(float c_x1, float c_y1, float c_z1){
 		vertex[0] = Vertex(c_x1, c_y1, c_z1);
-		vertex[1] = Vertex(c_x2, c_y2, c_z2);
-		vertex[2] = Vertex(c_x3, c_y3, c_z3);
-		nextTriangle = NULL;	
+		nextPoint = NULL;	
 	}
 };
 
@@ -57,9 +57,9 @@ struct Line{
 		nextLine = NULL;
 	}
 
-	Line(Vector3f _vertex1, Vector3f _vertex2){
-		vertex[0] = _vertex1;
-		vertex[1] = _vertex2;
+	Line(Vector3f _vertex0, Vector3f _vertex1){
+		vertex[0] = _vertex0;
+		vertex[1] = _vertex1;
 	}
 
 	Line(float c_x1, float c_y1, float c_z1,float c_x2, float c_y2, float c_z2){
@@ -69,23 +69,30 @@ struct Line{
 	}
 };
 
-struct Point{
-	Vertex  vertex[1];
+struct Triangle{
+	Vertex  vertex[3];
 
-	Point * nextPoint;
+	Triangle * nextTriangle;
 
-	Point(){
+	Triangle(){
 		vertex[0] = Vertex(0.0f, 0.0f, 0.0f);
-		nextPoint = NULL;
+		vertex[1] = Vertex(0.0f, 0.0f, 0.0f);
+		vertex[2] = Vertex(0.0f, 0.0f, 0.0f);
+		nextTriangle = NULL;
 	}
 
-	Point(Vector3f _vertex){
-		vertex[0] = _vertex;
+	Triangle(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex2){
+		vertex[0] = _vertex0;
+		vertex[1] = _vertex1;
+		vertex[2] = _vertex2;
+		nextTriangle = NULL;	
 	}
 
-	Point(float c_x1, float c_y1, float c_z1){
+	Triangle(float c_x1, float c_y1, float c_z1,float c_x2, float c_y2, float c_z2,float c_x3, float c_y3, float c_z3){
 		vertex[0] = Vertex(c_x1, c_y1, c_z1);
-		nextPoint = NULL;	
+		vertex[1] = Vertex(c_x2, c_y2, c_z2);
+		vertex[2] = Vertex(c_x3, c_y3, c_z3);
+		nextTriangle = NULL;	
 	}
 };
 
@@ -163,13 +170,15 @@ public:
 	void generateCordinateSystem();
 
 	void genaratePoint(float c_x1, float c_y1, float c_z1);
+	void genaratePoint(Vector3f _vertex0);
 
 	void genarateLine(float c_x1, float c_y1, float c_z1,float c_x2, float c_y2, float c_z2);
-	void genarateLine(Vector3f _vertex1, Vector3f _vertex2);
+	void genarateLine(Vector3f _vertex0, Vector3f _vertex1);
 
 	void genarateTriangle(float c_x1, float c_y1, float c_z1,float c_x2, float c_y2, float c_z2,float c_x3, float c_y3, float c_z3);
+	void genarateTriangle(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex3);
 
-	//void genarateSquare(float c_x0, float c_y0, float c_z0, float c_x1, float c_y1, float c_z1);
+
 	void genarateSquare(float c_x0, float c_y0, float c_z0, float c_x1, float c_y1, float c_z1, float c_x2, float c_y2, float c_z2);
 
 	void generateQuad(float c_x0, float c_y0, float c_z0, float c_x1, float c_y1, float c_z1);
