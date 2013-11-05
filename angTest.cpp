@@ -1,6 +1,5 @@
 /*
-
-	Copyright 2010 Etay Meiri
+	Copyright 2013 Christoph Schabert
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -14,9 +13,8 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-    Tutorial 15 - Camera Control - Part 2
 */
+
 
 #include <stdio.h>
 #include <string.h>
@@ -79,7 +77,7 @@ class AngTest : public ICallbacks{
 
 			m_pEffect->Enable();
 	
-			stereo = false;
+			stereo = true;
 			turnAround = false;
 
 			initGUI();
@@ -97,11 +95,19 @@ class AngTest : public ICallbacks{
 			m_pEffect->setboolGUI(0);
 			RenderPhase();
 			
+			//Disable 3D-Things
+			glDisable(GL_DEPTH_TEST);
+			//glDisable(GL_CULL_FACE);
+			
 			m_pEffect->setboolGUI(1);
 			GuiPhase();
 
 			m_pEffect->setboolGUI(2);
 			MousePhase(); //still unsed
+			
+			//Reaktivate 3D-Things
+			//glEnable(GL_CULL_FACE);
+			glEnable(GL_DEPTH_TEST);
 			
 			glutSwapBuffers();
 		}
@@ -111,13 +117,15 @@ class AngTest : public ICallbacks{
 		}
 
 		void GuiPhase(){
+
 			glEnableVertexAttribArray(0);
 			glBindBuffer(GL_ARRAY_BUFFER, m_guiVBO);
 
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-			glDrawArrays(GL_QUADS, 0,m_gui.numOfButtons * 4); // count => make dynamic
+			glDrawArrays(GL_QUADS, 0,m_gui.numOfButtons * 4);
 			
 			glDisableVertexAttribArray(0);
+
 		}
 
 		void RenderPhase(){

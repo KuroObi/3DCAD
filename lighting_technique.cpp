@@ -1,6 +1,5 @@
 /*
-
-	Copyright 2011 Etay Meiri
+	Copyright 2013 Christoph Schabert
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 
 #include "lighting_technique.h"
 
@@ -39,22 +39,7 @@ void main()                                                                     
     Color = vec4(fS,fS,fS, 1.0);													\n\
 }";
 
-static const char* pVg = "                                                         \n\
-#version 330                                                                        \n\
-                                                                                    \n\
-layout (location = 0) in vec3 Position;                                             \n\
-                                                                                    \n\
-out vec4 FragColor;																		\n\
-																					\n\
-void main()                                                                         \n\
-{                                                                                   \n\
-    gl_Position = vec4(Position, 1.0);												\n\
-	vec4 gS = vec4(clamp(Position, 0.0, 3.0),1.0);									\n\
-	float fS = (gS.x*2+gS.y*2+gS.z*3)/7;											\n\
-    FragColor = vec4(fS,fS,fS, 1.0);												\n\
-}";
-
-
+/*		next Step -> Textures
 static const char* pVS0 = "                                                         \n\
 #version 330                                                                        \n\
                                                                                     \n\
@@ -70,6 +55,7 @@ void main()                                                                     
     gl_Position = gWVP * vec4(Position, 1.0);                                       \n\
     TexCoord0 = TexCoord;                                                           \n\
 }";
+*/
 
 static const char* pFS = "                                                          \n\
 #version 330                                                                        \n\
@@ -105,11 +91,6 @@ bool LightingTechnique::Init(){
     if (!AddShader(GL_VERTEX_SHADER, pVS)){
         return false;
     }
-	/*
-    if (!AddShader(GL_VERTEX_SHADER, pVg)){
-        return false;
-    }
-	*/
     if (!AddShader(GL_FRAGMENT_SHADER, pFS)){
         return false;
     }

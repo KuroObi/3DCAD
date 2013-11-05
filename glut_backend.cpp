@@ -1,4 +1,4 @@
-/*
+﻿/*
 
 	Copyright 2011 Etay Meiri
 
@@ -105,14 +105,17 @@ void GLUTBackendRun(ICallbacks* pCallbacks){
     }
 
     glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
-    //glFrontFace(GL_CW);
-    //glCullFace(GL_BACK);
+       
+	//Draw both sides
 	//glEnable(GL_CULL_FACE);
-	glDisable(GL_CULL_FACE); //Draw both sides
+	glEnable(GL_DEPTH_TEST);
+	//glFrontFace(GL_CW);
+	//glCullFace(GL_BACK);
+	//glDisable(GL_CULL_FACE); 
 
     s_pCallbacks = pCallbacks;
     InitCallbacks();
 	
-	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
     glutMainLoop();
 }

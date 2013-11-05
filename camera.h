@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2010 Etay Meiri
+	Copyright 2013 Etay Meiri/Christoph Schabert
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
