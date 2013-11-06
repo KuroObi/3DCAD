@@ -60,12 +60,6 @@ class AngTest : public ICallbacks{
 			worldPos = Vector3f(0.0f, 0.0f, 3.0f);
 			m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, 0.05f);
 
-			//genratePyramid(0.0f); //Dummy
-			//genratePyramid(1.0f); //Dummy
-			//generateRandomPoints(100000,4);
-
-			//generateTestBLA();
-
 			CreateVertexBuffer();
 			//CreateIndexBuffer();
 
@@ -77,11 +71,15 @@ class AngTest : public ICallbacks{
 
 			m_pEffect->Enable();
 	
-			stereo = true;
+			stereo = false;
 			turnAround = false;
-
 			initGUI();
+			
+			m_mousePos = Vector3f(0.0, 0.0, 1.0);
 
+
+			initMouse();
+			
 			return true;
 		}
 
@@ -92,38 +90,69 @@ class AngTest : public ICallbacks{
 		virtual void RenderSceneCB(){
 			m_pGameCamera->OnRender();
 			
-			m_pEffect->setboolGUI(0);
+			m_pEffect->SetGUI(0);
 			RenderPhase();
 			
 			//Disable 3D-Things
 			glDisable(GL_DEPTH_TEST);
 			//glDisable(GL_CULL_FACE);
 			
-			m_pEffect->setboolGUI(1);
+			m_pEffect->SetGUI(1);
 			GuiPhase();
-
-			m_pEffect->setboolGUI(2);
-			MousePhase(); //still unsed
 			
 			//Reaktivate 3D-Things
 			//glEnable(GL_CULL_FACE);
 			glEnable(GL_DEPTH_TEST);
 			
+			m_pEffect->SetGUI(0);
+			MousePhase(); 
+
+
+			
 			glutSwapBuffers();
 		}
 
 		void MousePhase(){
-		
+			
+			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
+			if(stereo == true){
+				glColorMask(GL_FALSE,GL_TRUE,GL_TRUE,GL_TRUE);
+			}
+
+			glBindBuffer(GL_ARRAY_BUFFER, m_mouseVBO);
+
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+			
+			if(stereo == true){
+				m_pGameCamera->leftEye();
+				glColorMask(GL_TRUE,GL_FALSE,GL_FALSE,GL_FALSE);
+
+				glDrawArrays(GL_TRIANGLES, 0, 3);
+			
+				glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
+			}
+
+			glDisableVertexAttribArray(0);		
+			glDisableVertexAttribArray(1);
+			if(stereo == true){
+				m_pGameCamera->rightEye();
+			}
 		}
 
 		void GuiPhase(){
 
 			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
 			glBindBuffer(GL_ARRAY_BUFFER, m_guiVBO);
 
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
 			glDrawArrays(GL_QUADS, 0,m_gui.numOfButtons * 4);
 			
+			glDisableVertexAttribArray(1);
 			glDisableVertexAttribArray(0);
 
 		}
@@ -149,21 +178,23 @@ class AngTest : public ICallbacks{
 			m_pEffect->SetWVP(p.GetTrans());
 			m_pEffect->SetDirectionalLight(m_directionalLight);
 		
-			if(stereo == true)
-				glColorMask(GL_FALSE,GL_TRUE,GL_TRUE,GL_TRUE);
-
-
 			glEnableVertexAttribArray(0);
-			if(stereo == true)
+			glEnableVertexAttribArray(1);
+			if(stereo == true){
+				glColorMask(GL_FALSE,GL_TRUE,GL_TRUE,GL_TRUE);
 				glEnableVertexAttribArray(1);
+			}
 			glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
+
 			glDrawArrays(GL_POINTS,0, m_oManager.sector.numberOfPoints);
 			glDrawArrays(GL_LINES, m_oManager.sector.numberOfPoints, m_oManager.sector.numberOfLines*2);
 			glDrawArrays(GL_TRIANGLES, m_oManager.sector.numberOfPoints+m_oManager.sector.numberOfLines*2, m_oManager.sector.numberOfTriangles*3);
-
+			
 			glDrawBuffer(GL_BACK);
+
 			if(stereo == true){
 				m_pGameCamera->leftEye();
 
@@ -179,6 +210,8 @@ class AngTest : public ICallbacks{
 
 				glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
 			}
+
+			glDisableVertexAttribArray(1);
 			glDisableVertexAttribArray(0);
 			if(stereo == true){
 				glDisableVertexAttribArray(1);
@@ -198,19 +231,51 @@ class AngTest : public ICallbacks{
 			m_pGameCamera->OnKeyboard(Key);
 		}
 
-
 		virtual void KeyboardCB(unsigned char Key, int x, int y){
-			switch (Key){
-				case 'q':{
-					exit(0);
-					break;
-				}
-			}
+			switch(Key){
+						case 'n':
+							m_oManager = ObjectManager();
+							m_UI = UI();
+							break;
+						case 'q':
+							exit(0);
+							break;
+						case '1':
+							m_UI.changeDrawT(tPOINT);
+							break;
+						case '2':
+							m_UI.changeDrawT(tLINE);
+							break;
+						case '3':
+							m_UI.changeDrawT(tTRI);
+							break;
+						case '4':
+							m_UI.changeDrawT(tQUAD);
+							break;
+						case 's':
+							if(stereo){
+								stereo = false;
+							}else{
+								stereo = true;
+							}
+							break;
+					}
 		}
 
-
 		virtual void PassiveMouseCB(int x, int y){
-			m_pGameCamera->OnMouse(x, y);		
+			if(	x < WINDOW_WIDTH/100 ||
+				x > WINDOW_WIDTH - WINDOW_WIDTH/100 ||
+				y < WINDOW_HEIGHT/100 ||
+				y > WINDOW_HEIGHT - WINDOW_HEIGHT/100){
+				m_pGameCamera->OnMouse(x, y);		
+			}
+			float relativ_x = (((float)x)/((float)WINDOW_WIDTH) - 0.5f) * 2.0f;
+			float relativ_y = (((float)y)/((float)WINDOW_HEIGHT) - 0.5f) * -2.0f;
+			
+			//m_pEffect->SetMP(Vector3f(relativ_x, relativ_y, -2.0f));
+
+			m_mousePos = calcWorldPos(relativ_x, relativ_y);
+			initMouse();
 		}
 
 		virtual void MouseCB(int Button, int State, int x, int y){
@@ -240,8 +305,16 @@ class AngTest : public ICallbacks{
 						case QAD:
 							m_UI.changeDrawT(tQUAD);
 							break;
+						case STEREO:
+							if(stereo){
+								stereo = false;
+							}else{
+								stereo = true;
+							}
+							break;
 						case NOTHING:
 							m_UI.draw(calcWorldPos(relativ_x, relativ_y), &m_oManager);
+							break;
 					}
 					
 
@@ -257,13 +330,13 @@ class AngTest : public ICallbacks{
 			
 			float pi = (float) M_PI;
 
-			float angleA = m_pGameCamera->m_AngleH*(pi/180.0f) + (x*45.0f)*(pi/180.0f);
-			float angleB = m_pGameCamera->m_AngleV*(pi/180.0f) + (y*60.0f)*(pi/180.0f);
+			float angleA = (m_pGameCamera->m_AngleH + (x*45.0f)) * (pi/180.0f);
+			float angleB = (m_pGameCamera->m_AngleV + (y*25.0f)) * (pi/180.0f);
 				
 			Vector3f vp = m_pGameCamera->GetPos() - worldPos;
 
-			Vector3f v(1.5f, 0.0f, 0.0f);
-
+			Vector3f v(2.0f, 0.0f, 0.0f);
+				
 			float _x = cosf(angleA)*v.x + sinf(angleA)*v.z;
 			float _y = v.y;
 			float _z = -sinf(angleA)*v.x - cosf(angleA)*v.z;
@@ -271,6 +344,7 @@ class AngTest : public ICallbacks{
 			_x = _x + vp.x;
 			_y = cosf(angleB)*_y + sinf(angleB)*_z + vp.y;
 			_z = -sinf(angleB)*_y + cosf(angleB)*_z + vp.z;
+		
 			return Vector3f(_x, _y, _z);
 		}
 
@@ -281,13 +355,13 @@ class AngTest : public ICallbacks{
 
 			m_gui.init();
 			int numberOfButtons = m_gui.numOfButtons;
-			int sizeVertices = numberOfButtons* 4 * 12;
-			Vector3f * guiVert;
-			guiVert = new Vector3f[numberOfButtons * 4];
+			int sizeVertices = numberOfButtons* 4 * 12 * 2;
+			Vertex * guiVert;
+			guiVert = new Vertex[numberOfButtons * 4];
 
 			for(int c = 0; c < numberOfButtons; c++){
 				for(int v = 0; v < 4 ; v++){
-					guiVert[c*4 + v] = m_gui.button[c].vertex[v].getVector3f();
+					guiVert[c*4 + v] = Vertex(m_gui.button[c].vertex[v].getVector3f(),Vector3f(1.0f,0.0f,0.0f));
 				}
 			}
 						
@@ -297,22 +371,38 @@ class AngTest : public ICallbacks{
 
 		}
 
+		void initMouse(){
+										
+			Vertex * vcMouse;
+			vcMouse = new Vertex[3];
+
+			vcMouse[0] = Vertex(m_mousePos , Vector3f(0.0f,0.5f,0.0f));
+			vcMouse[1] = Vertex(m_mousePos + Vector3f(0.0f, -0.12f, 0.0f),Vector3f(0.0f,0.8f,0.0f));
+			vcMouse[2] = Vertex(m_mousePos + Vector3f(0.07f, -0.12f, 0.0f),Vector3f(0.0f,0.8f,0.0f));
+
+			glGenBuffers(1, &m_mouseVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, m_mouseVBO);
+			glBufferData(GL_ARRAY_BUFFER, 2 * 3 * 12, vcMouse, GL_DYNAMIC_DRAW);
+		}
+
 		void CreateVertexBuffer(){
 			int numPoi = m_oManager.sector.numberOfPoints;
 			int numLi = m_oManager.sector.numberOfLines;
 			int numTri = m_oManager.sector.numberOfTriangles;
 			int cVertes = 0;
-			int sizeVertices = (numPoi + numLi*2 + numTri*3) * 12;
-
-			Vector3f * Vertices;
-			Vertices = new Vector3f[numPoi + numLi*2 + numTri*3];
+			int sizeVertices = (numPoi + numLi*2 + numTri*3) * 12 * 2;
+			printf("%i",numLi);
+			Vertex * Vertices;
+			Vertices = new Vertex[numPoi + numLi*2 + numTri*3];
 			
 			Point * thisPoint = m_oManager.sector.HeadPoint;
-			Triangle * thisTriangle = m_oManager.sector.HeadTriangle;
 			Line * thisLine = m_oManager.sector.HeadLine;
+			Triangle * thisTriangle = m_oManager.sector.HeadTriangle;
+			
 			
 			for(int cPoi = 0; cPoi < numPoi; cPoi++){
-				Vertices[cVertes] = Vector3f(thisPoint->vertex[0].getVector3f());
+				Vertices[cVertes] = Vertex(	thisPoint->vertex[0].xyz,
+											thisPoint->vertex[0].rgb);
 				cVertes++;
 				if(thisPoint->nextPoint != NULL){
 					thisPoint = thisPoint->nextPoint;
@@ -320,7 +410,8 @@ class AngTest : public ICallbacks{
 			}
 			for(int cLi = 0; cLi < numLi; cLi++){
 				for(int cThisVertice = 0; cThisVertice < 2; cThisVertice++){
-					Vertices[cVertes] = Vector3f(thisLine->vertex[cThisVertice].getVector3f());
+					Vertices[cVertes] = Vertex(	thisLine->vertex[cThisVertice].xyz,
+												thisLine->vertex[cThisVertice].rgb);
 					cVertes++;
 				}
 				if(thisLine->nextLine == NULL){
@@ -331,7 +422,8 @@ class AngTest : public ICallbacks{
 			}	
 			for(int cTri = 0; cTri < numTri; cTri++){
 				for(int cThisVertice = 0; cThisVertice < 3; cThisVertice++){
-					Vertices[cVertes] = Vector3f(thisTriangle->vertex[cThisVertice].getVector3f());
+					Vertices[cVertes] = Vertex(	thisTriangle->vertex[cThisVertice].xyz,
+												thisTriangle->vertex[cThisVertice].rgb);
 					cVertes++;
 				}
 				if(thisTriangle->nextTriangle == NULL){
@@ -340,7 +432,6 @@ class AngTest : public ICallbacks{
 					thisTriangle = thisTriangle->nextTriangle;
 				}
 			}	
-
 			glGenBuffers(1, &m_VBO);
 			glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 			glBufferData(GL_ARRAY_BUFFER, sizeVertices, Vertices, GL_DYNAMIC_DRAW);
@@ -349,6 +440,7 @@ class AngTest : public ICallbacks{
 	//Variables
 	    GLuint m_VBO;
 		GLuint m_guiVBO;
+		GLuint m_mouseVBO;
 
 		GLuint m_IBO;
 		LightingTechnique* m_pEffect;
@@ -359,6 +451,7 @@ class AngTest : public ICallbacks{
 		ObjectManager m_oManager;
 		UI m_UI;
 		gui m_gui;
+		Vector3f m_mousePos;
 
 		bool stereo;
 		bool turnAround;
@@ -369,7 +462,7 @@ class AngTest : public ICallbacks{
 int main(int argc, char** argv){
     GLUTBackendInit(argc, argv);
 
-	bool fullScreen = true;
+	bool fullScreen = false;
 
 	if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 60, fullScreen, "AngTest")){
         return 1;

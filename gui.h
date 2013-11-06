@@ -27,6 +27,7 @@ enum func{
 	NOTHING,
 	NEW,
 	QUIT,
+	STEREO,
 	POI,
 	LINE,
 	TRI,
@@ -54,8 +55,9 @@ struct Button{
 class gui{
 public:
 	gui(){
-		numOfButtons = 6;
+		numOfButtons = 7;
 		button = new Button[numOfButtons];
+
 	};
 
 	//~gui();
@@ -66,6 +68,8 @@ public:
 
 	int numOfButtons;
 	Button* button;
+
+	Triangle mouse;
 
 };
 

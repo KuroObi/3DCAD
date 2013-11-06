@@ -23,13 +23,19 @@
 
 struct Vertex{
 	Vector3f xyz;
-	Vector2f uv;
+	Vector3f rgb;
 	
 	Vertex(){
 	};
 
 	Vertex(Vector3f _Vertex){
 		xyz = _Vertex;
+		rgb = Vector3f(0.2f, 0.2f, 0.2f);
+	}
+	
+	Vertex(Vector3f _Vertex, Vector3f _Color){
+		xyz = _Vertex;
+		rgb = _Color;
 	}
 
 	Vertex(float _x, float _y, float _z){
@@ -57,6 +63,11 @@ struct Point{
 		vertex[0] = _vertex0;
 	}
 
+	Point(Vector3f _vertex0, Vector3f _color){
+		vertex[0].xyz = _vertex0;
+		vertex[0].rgb = _color;
+	}
+
 	Point(float c_x1, float c_y1, float c_z1){
 		vertex[0] = Vertex(c_x1, c_y1, c_z1);
 		nextPoint = NULL;	
@@ -77,7 +88,19 @@ struct Line{
 	Line(Vector3f _vertex0, Vector3f _vertex1){
 		vertex[0] = _vertex0;
 		vertex[1] = _vertex1;
+		
 	}
+
+	Line(Vector3f _vertex0, Vector3f _vertex1, Vector3f _color){
+		vertex[0].xyz = _vertex0;
+		vertex[0].rgb = _color;
+		vertex[1].xyz = _vertex1;
+		vertex[1].rgb = _color;
+	}
+
+
+
+
 
 	Line(float c_x1, float c_y1, float c_z1,float c_x2, float c_y2, float c_z2){
 		vertex[0] = Vertex(c_x1, c_y1, c_z1);
@@ -191,12 +214,13 @@ public:
 
 	void genarateLine(float c_x1, float c_y1, float c_z1,float c_x2, float c_y2, float c_z2);
 	void genarateLine(Vector3f _vertex0, Vector3f _vertex1);
+	void genarateLine(Vector3f _vertex0, Vector3f _vertex1, Vector3f _color);
 
 	void genarateTriangle(float c_x1, float c_y1, float c_z1,float c_x2, float c_y2, float c_z2,float c_x3, float c_y3, float c_z3);
 	void genarateTriangle(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex3);
 
-
 	void genarateSquare(float c_x0, float c_y0, float c_z0, float c_x1, float c_y1, float c_z1, float c_x2, float c_y2, float c_z2);
+	void genarateSquare(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex3);
 
 	void generateQuad(float c_x0, float c_y0, float c_z0, float c_x1, float c_y1, float c_z1);
 	void generateQuad(float c_x0, float c_y0, float c_z0, float c_x1, float c_y1, float c_z1,float c_x2, float c_y2, float c_z2);

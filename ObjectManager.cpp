@@ -27,17 +27,25 @@ ObjectManager::ObjectManager(){
 
 
 void ObjectManager::generateCordinateSystem(){
-	genarateLine(0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
-	genarateLine(1.0f, 0.0f, 0.0f, 0.95f, 0.025f, 0.0f);
-	genarateLine(1.0f, 0.0f, 0.0f, 0.95f, -0.025f, 0.0f);
+	Vector3f center = Vector3f(0.0f, 0.0f, 0.0f);
+	Vector3f xA = Vector3f(1.0f, 0.0f, 0.0f);
+	Vector3f yA = Vector3f(0.0f, 1.0f, 0.0f);
+	Vector3f zA = Vector3f(0.0f, 0.0f, 1.0f);
+	Vector3f red = Vector3f(1.0f, 0.0f, 0.0f);
+	Vector3f green = Vector3f(0.0f, 0.8f, 0.0f);
+	Vector3f blue = Vector3f(0.0f, 0.0f, 1.0f);
+
+	genarateLine(center, xA, red);
+	genarateLine(xA, Vector3f(0.95f, 0.025f, 0.0f), red);
+	genarateLine(xA, Vector3f(0.95f, -0.025f, 0.0f), red);
 	
-	genarateLine(0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-	genarateLine(0.0f, 1.0f, 0.0f, 0.05f, 0.95f, -0.025f);
-	genarateLine(0.0f, 1.0f, 0.0f, -0.05f, 0.95f, 0.025f);
+	genarateLine(center, yA, blue);
+	genarateLine(yA, Vector3f(0.05f, 0.95f, -0.025f), blue);
+	genarateLine(yA, Vector3f(-0.05f, 0.95f, 0.025f), blue);
 	
-	genarateLine(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-	genarateLine(0.0f, 0.0f, 1.0f, 0.0f, 0.025f, 0.95f);
-	genarateLine(0.0f, 0.0f, 1.0f, 0.0f, -0.025f, 0.95f);
+	genarateLine(center, zA, green);
+	genarateLine(zA, Vector3f(0.0f, 0.025f, 0.95f), green);
+	genarateLine(zA, Vector3f(0.0f, -0.025f, 0.95f), green);
 }
 
 void ObjectManager::genaratePoint(float c_x0, float c_y0, float c_z0){	
@@ -68,6 +76,13 @@ void ObjectManager::genarateLine(Vector3f _vertex0, Vector3f _vertex1){
 	sector.addLine(generatetLine);
 }
 
+void ObjectManager::genarateLine(Vector3f _vertex0, Vector3f _vertex1, Vector3f _color){	
+	Line * generatetLine = new Line;
+
+	generatetLine = new Line(_vertex0, _vertex1, _color);
+	sector.addLine(generatetLine);
+}
+
 void ObjectManager::genarateTriangle(float c_x0, float c_y0, float c_z0, float c_x1, float c_y1, float c_z1,float c_x2, float c_y2, float c_z2){	
 	Triangle * generatedTriangle = new Triangle;
 
@@ -93,6 +108,19 @@ void ObjectManager::genarateSquare(float c_x0, float c_y0, float c_z0, float c_x
 	generatedTriangle2 = new Triangle(c_x0, c_y0, c_z0,
 									((c_x0+c_x2) - c_x1), ((c_y0+c_y2) -  c_y1), ((c_z0+c_z2) -  c_z1),
 									c_x2, c_y2, c_z2);
+	
+	sector.addTriangle(generatedTriangle1);
+	sector.addTriangle(generatedTriangle2);
+
+	//printf("Tri: %f/%f/%f\n", c_x0, c_y0, c_z0);
+}
+
+void ObjectManager::genarateSquare(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex2){
+	Triangle * generatedTriangle1 = new Triangle;
+	Triangle * generatedTriangle2 = new Triangle;
+
+	generatedTriangle1 = new Triangle(_vertex0, _vertex1, _vertex2);
+	generatedTriangle2 = new Triangle(_vertex0, _vertex1, _vertex2);
 	
 	sector.addTriangle(generatedTriangle1);
 	sector.addTriangle(generatedTriangle2);

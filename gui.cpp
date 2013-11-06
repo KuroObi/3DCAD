@@ -20,6 +20,10 @@
 
 
 void gui::init(){
+	mouse  = Triangle(	Vector3f(0.0f, 0.0f, 0.0f),
+						Vector3f(0.03f, -0.01f, 0.0f),
+						Vector3f(0.01f, -0.06f, 0.0f));
+
 	button[0] = Button(	Vector3f(-0.95f, 0.8f, 0.0f),
 						Vector3f(-0.8f, 0.95f, 0.0f),
 						NEW);
@@ -28,16 +32,20 @@ void gui::init(){
 						Vector3f(0.95f, 0.95f, 0.0f),
 						QUIT);
 
-	button[2] = Button(	Vector3f(-0.23f, -0.95f, 0.0f),
+	button[2] = Button(	Vector3f(0.9f, -0.95f, 0.0f),
+						Vector3f(0.95f, -0.9f, 0.0f),
+						STEREO);
+
+	button[3] = Button(	Vector3f(-0.23f, -0.95f, 0.0f),
 						Vector3f(-0.13f, -0.85f, 0.0f),
 						POI);
-	button[3] = Button( Vector3f(-0.11f, -0.95f, 0.0f),
+	button[4] = Button( Vector3f(-0.11f, -0.95f, 0.0f),
 						Vector3f(-0.01f, -0.85f, 0.0f),
 						LINE);
-	button[4] = Button(	Vector3f(0.01f, -0.95f, 0.0f),
+	button[5] = Button(	Vector3f(0.01f, -0.95f, 0.0f),
 						Vector3f(0.11f, -0.85f, 0.0f),
 						TRI);
-	button[5] = Button(	Vector3f(0.13f, -0.95f, 0.0f),
+	button[6] = Button(	Vector3f(0.13f, -0.95f, 0.0f),
 						Vector3f(0.23f, -0.85f, 0.0f),
 						QAD);
 	

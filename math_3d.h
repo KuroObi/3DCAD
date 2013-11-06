@@ -132,6 +132,38 @@ inline Vector3f operator*(const Vector3f& l, float f)
     return Ret;
 }
 
+struct Vertex3Drgb{
+    float x, y, z;
+    float r, g, b;
+
+    Vertex3Drgb(){
+    }
+
+    Vertex3Drgb(float _x, float _y, float _z, float _r, float _g, float _b)
+    {
+        x = _x;
+        y = _y;
+        z = _z;
+		r = _r;
+		g = _g;
+		b = _b;
+    }
+
+	Vertex3Drgb(Vector3f _xyz, Vector3f _rgb){
+		x = _xyz.x;
+        y = _xyz.y;
+        z = _xyz.z;
+		r = _rgb.x;
+		g = _rgb.y;
+		b = _rgb.z;
+	}
+
+    void Print() const
+    {
+        printf("(%.02f/%.02f/%.02f)[%f/%f/%f]\n", x,y,z, r,g,b);
+    }
+};
+
 
 class Matrix4f{
 	public:

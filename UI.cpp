@@ -39,7 +39,7 @@ void UI::draw(Vector3f _vertic, ObjectManager * p_oManager){
 	drawingV[vCount] = _vertic;
 	vCount++;
 
-	if(vCount == drawT){
+	if(vCount == drawT%10){
 		switch(drawT){
 			case tPOINT:{
 				p_oManager->genaratePoint(drawingV[0]);
@@ -53,14 +53,14 @@ void UI::draw(Vector3f _vertic, ObjectManager * p_oManager){
 				p_oManager->genarateTriangle(drawingV[0], drawingV[1], drawingV[2]);
 			}
 			break;
-			/*
 			case tSQUAR:{
+				p_oManager->genarateSquare(drawingV[0], drawingV[1], drawingV[2]);
 			}
 			break;
 			case tQUAD:{
 			}
 			break;
-			*/
+			
 		}
 		vCount = 0;
 	}
