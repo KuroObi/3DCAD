@@ -76,7 +76,8 @@ class AngTest : public ICallbacks{
 			initGUI();
 			
 			m_mousePos = Vector3f(0.0, 0.0, 1.0);
-
+			m_mouseVector = Vector3f(0.0f, 0.0f, 2.0f);
+			m_mouse2DPos = Vector2f(0.0f, 0.0f);
 
 			initMouse();
 			
@@ -107,8 +108,6 @@ class AngTest : public ICallbacks{
 			m_pEffect->SetGUI(0);
 			MousePhase(); 
 
-
-			
 			glutSwapBuffers();
 		}
 
@@ -124,13 +123,13 @@ class AngTest : public ICallbacks{
 
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
-			glDrawArrays(GL_TRIANGLES, 0, 3);
+			glDrawArrays(GL_LINES, 0, 6);
 			
 			if(stereo == true){
 				m_pGameCamera->leftEye();
 				glColorMask(GL_TRUE,GL_FALSE,GL_FALSE,GL_FALSE);
 
-				glDrawArrays(GL_TRIANGLES, 0, 3);
+				glDrawArrays(GL_LINES, 0, 6);
 			
 				glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
 			}
@@ -269,16 +268,40 @@ class AngTest : public ICallbacks{
 				y > WINDOW_HEIGHT - WINDOW_HEIGHT/100){
 				m_pGameCamera->OnMouse(x, y);		
 			}
+			
 			float relativ_x = (((float)x)/((float)WINDOW_WIDTH) - 0.5f) * 2.0f;
 			float relativ_y = (((float)y)/((float)WINDOW_HEIGHT) - 0.5f) * -2.0f;
-			
-			//m_pEffect->SetMP(Vector3f(relativ_x, relativ_y, -2.0f));
-
-			m_mousePos = calcWorldPos(relativ_x, relativ_y);
+			m_mouse2DPos = Vector2f(relativ_x, relativ_y);
+			m_mousePos = calcWorldPos();
 			initMouse();
 		}
 
 		virtual void MouseCB(int Button, int State, int x, int y){
+			
+			if (Button == 4 || Button == 3) {
+				
+				if(State == GLUT_DOWN){
+					State = GLUT_UP;						
+					if(Button == 3){				//Mouse Scroll up
+						if(m_mouseVector.Dist(m_pGameCamera->GetPos() - worldPos) > 7.0f) {
+							return;
+						}
+						m_mouseVector += m_mouseVector * 0.01f;
+					}
+					else{						//Mouse Scroll down
+						if(m_mouseVector.Dist(m_pGameCamera->GetPos() - worldPos) < 4.0f) {
+							return;
+						}
+						m_mouseVector -= m_mouseVector * 0.01f;
+					}
+
+					calcWorldPos();
+					initMouse();
+					
+					return;
+				}
+			}
+
 			if (Button == GLUT_LEFT_BUTTON) {
 				
 				if(State == GLUT_DOWN){
@@ -313,7 +336,7 @@ class AngTest : public ICallbacks{
 							}
 							break;
 						case NOTHING:
-							m_UI.draw(calcWorldPos(relativ_x, relativ_y), &m_oManager);
+							m_UI.draw(calcWorldPos(), &m_oManager);
 							break;
 					}
 					
@@ -322,29 +345,45 @@ class AngTest : public ICallbacks{
 					
 					CreateVertexBuffer();
 					State = GLUT_UP;
+					
+					return;
 				}
 			}
 		}
 
-		Vector3f calcWorldPos(float x, float y){
+		Vector3f calcWorldPos(){
 			
-			float pi = (float) M_PI;
+			//float pi = (float) M_PI;
 
-			float angleA = (m_pGameCamera->m_AngleH + (x*45.0f)) * (pi/180.0f);
-			float angleB = (m_pGameCamera->m_AngleV + (y*25.0f)) * (pi/180.0f);
-				
+			//float angleA = (x*1.0f) + (m_pGameCamera->m_AngleH) * (pi/180.0f);
+			//float angleB = (y*0.5f) + (m_pGameCamera->m_AngleV) * (pi/180.0f);
+			
+			
+
+			//printf("%f/%f/%f\n",m_pGameCamera->GetTarget().x,m_pGameCamera->GetTarget().y,m_pGameCamera->GetTarget().z);
+						
+			
+
 			Vector3f vp = m_pGameCamera->GetPos() - worldPos;
-
-			Vector3f v(2.0f, 0.0f, 0.0f);
+			
 				
+			float _x = vp.x + m_mouseVector.x + (m_mouse2DPos.x * 2.0f);
+			float _y = vp.y + m_mouseVector.y + (m_mouse2DPos.y * 1.0f);
+			float _z = vp.z + m_mouseVector.z;
+
+			/*
 			float _x = cosf(angleA)*v.x + sinf(angleA)*v.z;
 			float _y = v.y;
-			float _z = -sinf(angleA)*v.x - cosf(angleA)*v.z;
-			
-			_x = _x + vp.x;
-			_y = cosf(angleB)*_y + sinf(angleB)*_z + vp.y;
-			_z = -sinf(angleB)*_y + cosf(angleB)*_z + vp.z;
+			float _z = -sinf(angleA)*v.x + cosf(angleA)*v.z;
+
+			_x = _x; // + vp.x;
+			_y = cosf(angleB)*_y + sinf(angleB)*_z; // + vp.y;
+			_z = -sinf(angleB)*_y + cosf(angleB)*_z  + vp.z;
+			*/
+
 		
+			//Vector3f(_x, _y, _z).Print();
+
 			return Vector3f(_x, _y, _z);
 		}
 
@@ -374,15 +413,20 @@ class AngTest : public ICallbacks{
 		void initMouse(){
 										
 			Vertex * vcMouse;
-			vcMouse = new Vertex[3];
+			vcMouse = new Vertex[6];
 
-			vcMouse[0] = Vertex(m_mousePos , Vector3f(0.0f,0.5f,0.0f));
-			vcMouse[1] = Vertex(m_mousePos + Vector3f(0.0f, -0.12f, 0.0f),Vector3f(0.0f,0.8f,0.0f));
-			vcMouse[2] = Vertex(m_mousePos + Vector3f(0.07f, -0.12f, 0.0f),Vector3f(0.0f,0.8f,0.0f));
+			vcMouse[0] = Vertex(m_mousePos - Vector3f(0.05f,0.0f,0.0f) , Vector3f(1.0f,1.0f,1.0f));
+			vcMouse[1] = Vertex(m_mousePos - Vector3f(-0.05f,0.0f,0.0f), Vector3f(1.0f,1.0f,1.0f));
+
+			vcMouse[2] = Vertex(m_mousePos - Vector3f(0.0f,0.05f,0.0f) , Vector3f(1.0f,1.0f,1.0f));
+			vcMouse[3] = Vertex(m_mousePos - Vector3f(0.0f,-0.05f,0.0f), Vector3f(1.0f,1.0f,1.0f));
+
+			vcMouse[4] = Vertex(m_mousePos - Vector3f(0.0f,0.0f,0.05f) , Vector3f(1.0f,1.0f,1.0f));
+			vcMouse[5] = Vertex(m_mousePos - Vector3f(0.0f,0.0f,-0.05f), Vector3f(1.0f,1.0f,1.0f));
 
 			glGenBuffers(1, &m_mouseVBO);
 			glBindBuffer(GL_ARRAY_BUFFER, m_mouseVBO);
-			glBufferData(GL_ARRAY_BUFFER, 2 * 3 * 12, vcMouse, GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, 2 * 6 * 12, vcMouse, GL_DYNAMIC_DRAW);
 		}
 
 		void CreateVertexBuffer(){
@@ -391,7 +435,7 @@ class AngTest : public ICallbacks{
 			int numTri = m_oManager.sector.numberOfTriangles;
 			int cVertes = 0;
 			int sizeVertices = (numPoi + numLi*2 + numTri*3) * 12 * 2;
-			printf("%i",numLi);
+			//printf("%i",numLi);
 			Vertex * Vertices;
 			Vertices = new Vertex[numPoi + numLi*2 + numTri*3];
 			
@@ -452,6 +496,8 @@ class AngTest : public ICallbacks{
 		UI m_UI;
 		gui m_gui;
 		Vector3f m_mousePos;
+		Vector3f m_mouseVector;
+		Vector2f m_mouse2DPos;
 
 		bool stereo;
 		bool turnAround;
@@ -465,15 +511,18 @@ int main(int argc, char** argv){
 	bool fullScreen = false;
 
 	if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 60, fullScreen, "AngTest")){
-        return 1;
+        return 0x11;
     }
 
 	AngTest* aTest = new AngTest();
 
+
 	if (!aTest->Init()){
-        return 1;
+        return 0x12;
     }
-    aTest->Run();
+	
+
+	aTest->Run();
 
     delete aTest;
  

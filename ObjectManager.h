@@ -42,6 +42,7 @@ struct Vertex{
 		xyz.x = _x;
 		xyz.y = _y;
 		xyz.z = _z;
+		rgb = Vector3f(0.2f, 0.2f, 0.2f);
 	}
 
 	Vector3f getVector3f(){

@@ -69,8 +69,8 @@ void Camera::Init(){
             m_AngleH = 90.0f + ToDegree(asin(-HTarget.z));
         }
     }
-    
-    m_AngleV = -ToDegree(asin(m_target.y));
+
+	m_AngleV = -ToDegree(asin(m_target.y));
 
     m_OnUpperEdge = false;
     m_OnLowerEdge = false;
@@ -210,6 +210,10 @@ void Camera::OnRender(){
     }
 
     if (ShouldUpdate){
+		if(m_AngleH >= 360)
+			m_AngleH = 1;
+		if(m_AngleH <= 0)
+			m_AngleH = 359;
         Update();
     }
 }

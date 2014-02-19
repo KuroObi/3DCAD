@@ -26,14 +26,11 @@ layout (location = 1) in vec3 Color;												\n\
                                                                                     \n\
 uniform mat4 gWVP;                                                                  \n\
 uniform int gui;																	\n\
-uniform vec3 MVector;																\n\
 																					\n\
 out vec4 frag_color;																\n\
                                                                                     \n\
 void main()                                                                         \n\
 {                                                                                   \n\
-	vec4 gS = vec4(clamp(Position, 0.0, 3.0),1.0);									\n\
-	float fS = (gS.x*2+gS.y*2+gS.z*3)/7;											\n\
 	switch (gui){																	\n\
 		case 0:																		\n\
 			gl_Position = gWVP * vec4(Position, 1.0);		                        \n\
@@ -42,14 +39,6 @@ void main()                                                                     
 		case 1:																		\n\
 			gl_Position = vec4(Position, 1.0);										\n\
 			frag_color = vec4(Color, 1.0);											\n\
-			break;																	\n\
-		case 2:																		\n\
-			gl_Position = vec4(Position, 1.0);										\n\
-			frag_color = vec4(Color, 1.0);											\n\
-			break;																	\n\
-		default:																	\n\
-			gl_Position = vec4(MVector, 1.0);										\n\
-			frag_color = vec4(fS,fS,fS, 1.0);										\n\
 			break;																	\n\
 	}																				\n\
 }";
@@ -100,30 +89,32 @@ LightingTechnique::LightingTechnique(){
 
 bool LightingTechnique::Init(){
     if (!Technique::Init()){
+		printf("Technique Error");
         return false;
     }
 
-    if (!AddShader(GL_VERTEX_SHADER, pVS)){
+	
+	if (!AddShader(GL_VERTEX_SHADER, pVS)){
         return false;
     }
+	
     if (!AddShader(GL_FRAGMENT_SHADER, pFS)){
         return false;
     }
-
+	
     if (!Finalize()){
         return false;
     }
 
     m_WVPLocation = GetUniformLocation("gWVP");
 	m_GUILocation = GetUniformLocation("gui");
-	m_MVectorLocation = GetUniformLocation("MVector");
     m_dirLightColorLocation = GetUniformLocation("gDirectionalLight.Color");
     m_dirLightAmbientIntensityLocation = GetUniformLocation("gDirectionalLight.AmbientIntensity");
 
     if (m_dirLightAmbientIntensityLocation == 0xFFFFFFFF ||
         m_WVPLocation == 0xFFFFFFFF ||
         m_dirLightColorLocation == 0xFFFFFFFF||
-		m_MVectorLocation == 0xFFFFFFFF||
+		//m_MVectorLocation == 0xFFFFFFFF||
         m_GUILocation == 0xFFFFFFFF){
         return false;
     }
@@ -142,9 +133,4 @@ void LightingTechnique::SetDirectionalLight(const DirectionalLight& Light){
 
 void LightingTechnique::SetGUI(int _gui){
 	glUniform1i(m_GUILocation, _gui);
-}
-
-void LightingTechnique::SetMP(Vector3f _mVector){
-	glUniform3f(m_MVectorLocation, _mVector.x, _mVector.y, _mVector.z);
-	//glUniform3f(m_MVectorLocation, 0,0,20);
 }
