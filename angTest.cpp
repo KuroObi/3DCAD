@@ -57,8 +57,10 @@ class AngTest : public ICallbacks{
 			Vector3f Target(0.0f, -0.2f, 1.0f);
 			Vector3f Up(0.0, 0.0f, 0.0f);
 
+			eyeStep = 0.1f;
+
 			worldPos = Vector3f(0.0f, 0.0f, 3.0f);
-			m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, 0.05f);
+			m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, eyeStep);
 
 			CreateVertexBuffer();
 			//CreateIndexBuffer();
@@ -78,6 +80,7 @@ class AngTest : public ICallbacks{
 			m_mousePos = Vector3f(0.0, 0.0, 1.0);
 			m_mouseVector = Vector3f(0.0f, 0.0f, 1.0f);
 			m_mouse2DPos = Vector2f(0.0f, 0.0f);
+			horoptor = 1.0f;
 
 			initMouse();
 			
@@ -89,6 +92,12 @@ class AngTest : public ICallbacks{
 		}
 
 		virtual void RenderSceneCB(){
+
+			if(stereo){
+				horoptor = m_mouseVector.Dist(m_pGameCamera->GetPos() - worldPos);
+				//horoptor = atanf(horoptor/eyeStep);
+			}
+
 			m_pGameCamera->OnRender();
 			
 			m_pEffect->SetGUI(0);
@@ -126,7 +135,7 @@ class AngTest : public ICallbacks{
 			glDrawArrays(GL_LINES, 0, 6);
 			
 			if(stereo == true){
-				m_pGameCamera->leftEye();
+				m_pGameCamera->leftEye(horoptor);
 				glColorMask(GL_TRUE,GL_FALSE,GL_FALSE,GL_FALSE);
 
 				glDrawArrays(GL_LINES, 0, 6);
@@ -137,7 +146,7 @@ class AngTest : public ICallbacks{
 			glDisableVertexAttribArray(0);		
 			glDisableVertexAttribArray(1);
 			if(stereo == true){
-				m_pGameCamera->rightEye();
+				m_pGameCamera->rightEye(horoptor);
 			}
 		}
 
@@ -195,7 +204,7 @@ class AngTest : public ICallbacks{
 			glDrawBuffer(GL_BACK);
 
 			if(stereo == true){
-				m_pGameCamera->leftEye();
+				m_pGameCamera->leftEye(horoptor);
 
 				p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
 				p.SetPerspectiveProj(60.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 100.0f);
@@ -214,7 +223,7 @@ class AngTest : public ICallbacks{
 			glDisableVertexAttribArray(0);
 			if(stereo == true){
 				glDisableVertexAttribArray(1);
-				m_pGameCamera->rightEye();
+				m_pGameCamera->rightEye(horoptor);
 			}
 		}
 
@@ -279,15 +288,18 @@ class AngTest : public ICallbacks{
 		virtual void MouseCB(int Button, int State, int x, int y){
 			
 			if (Button == 4 || Button == 3) {
-				if(m_mouseVector.Dist(m_pGameCamera->GetPos() - worldPos) > 7.0f) {
-							return;
-						}				
 				if(State == GLUT_DOWN){
 					State = GLUT_UP;						
 					if(Button == 3){				//Mouse Scroll up
+						if(m_mouseVector.Dist(m_pGameCamera->GetPos() - worldPos) > 7.0f) {
+							return;
+						}
 						m_mouseVector += m_mouseVector * 0.01f;
 					}
 					else{						//Mouse Scroll down
+						if(m_mouseVector.Dist(m_pGameCamera->GetPos() - worldPos) <= 3.0f) {
+							return;
+						}
 						m_mouseVector -= m_mouseVector * 0.01f;
 					}
 
@@ -349,29 +361,20 @@ class AngTest : public ICallbacks{
 		}
 
 		void calcWorldPos(){	
-			//printf("%f\n",m_mouseVector.Dist(m_pGameCamera->GetPos() - m_mouseVector));
-			
-			//m_pGameCamera->GetTarget().Print();
-
 			m_mousePos = m_pGameCamera->GetPos() - worldPos;
 
 			m_mousePos += (m_pGameCamera->GetTarget() * m_mouseVector.Dist(m_pGameCamera->GetPos() - m_mouseVector));
 						
 			m_mousePos.x += (m_mouse2DPos.x * 2.0f) * m_pGameCamera->GetTarget().z;
 			m_mousePos.z += (m_mouse2DPos.x * 2.0f) * -m_pGameCamera->GetTarget().x;
-			
-
-			//printf("%f/%f\n",sinf(m_pGameCamera->GetTarget().x),cosf(m_pGameCamera->GetTarget().x));
 
 			m_mousePos.y += (m_mouse2DPos.y * 1.0f);
-			
 		}
 
 
 	private:
 
 		void initGUI(){
-
 			m_gui.init();
 			int numberOfButtons = m_gui.numOfButtons;
 			int sizeVertices = numberOfButtons* 4 * 12 * 2;
@@ -478,6 +481,9 @@ class AngTest : public ICallbacks{
 		Vector3f m_mousePos;
 		Vector3f m_mouseVector;
 		Vector2f m_mouse2DPos;
+
+		float eyeStep;
+		float horoptor;
 
 		bool stereo;
 		bool turnAround;

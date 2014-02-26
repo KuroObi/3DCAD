@@ -82,19 +82,27 @@ void Camera::Init(){
     glutWarpPointer(m_mousePos.x, m_mousePos.y);
 }
 
-float Camera::leftEye(){
+float Camera::leftEye(float horoptor){
 	Vector3f Left = m_target.Cross(m_up);
 	Left.Normalize();
 	Left *= m_EyeStep;
 	m_pos += Left;
+
+	m_AngleH -= horoptor;		
+	Update();
+	
 	return 0.0f;
 }
 
-float Camera::rightEye(){
+float Camera::rightEye(float horoptor){
+	m_AngleH += horoptor;		
+	Update();
+
 	Vector3f Right = m_up.Cross(m_target);
 	Right.Normalize();
 	Right *= m_EyeStep;
 	m_pos += Right;
+
 	return 0.0f;
 }
 
