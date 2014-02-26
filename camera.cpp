@@ -88,14 +88,14 @@ float Camera::leftEye(float horoptor){
 	Left *= m_EyeStep;
 	m_pos += Left;
 
-	m_AngleH -= horoptor;		
+	m_AngleH += horoptor;		
 	Update();
 	
 	return 0.0f;
 }
 
 float Camera::rightEye(float horoptor){
-	m_AngleH += horoptor;		
+	m_AngleH -= horoptor;		
 	Update();
 
 	Vector3f Right = m_up.Cross(m_target);

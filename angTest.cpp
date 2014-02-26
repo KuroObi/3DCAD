@@ -33,6 +33,7 @@
 
 #define WINDOW_WIDTH  1600
 #define WINDOW_HEIGHT 900
+#define PI 3.14159265359f
 
 class AngTest : public ICallbacks{
 	public:
@@ -57,7 +58,7 @@ class AngTest : public ICallbacks{
 			Vector3f Target(0.0f, -0.2f, 1.0f);
 			Vector3f Up(0.0, 0.0f, 0.0f);
 
-			eyeStep = 0.1f;
+			eyeStep = 0.2f;
 
 			worldPos = Vector3f(0.0f, 0.0f, 3.0f);
 			m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, eyeStep);
@@ -95,7 +96,9 @@ class AngTest : public ICallbacks{
 
 			if(stereo){
 				horoptor = m_mouseVector.Dist(m_pGameCamera->GetPos() - worldPos);
-				//horoptor = atanf(horoptor/eyeStep);
+				//horoptor = 1.9f;
+				horoptor = atanf(eyeStep/horoptor) * 360.0f/PI;
+				printf("%f\n", horoptor);
 			}
 
 			m_pGameCamera->OnRender();
