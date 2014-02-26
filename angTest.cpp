@@ -76,7 +76,7 @@ class AngTest : public ICallbacks{
 			initGUI();
 			
 			m_mousePos = Vector3f(0.0, 0.0, 1.0);
-			m_mouseVector = Vector3f(0.0f, 0.0f, 2.0f);
+			m_mouseVector = Vector3f(0.0f, 0.0f, 1.0f);
 			m_mouse2DPos = Vector2f(0.0f, 0.0f);
 
 			initMouse();
@@ -272,26 +272,22 @@ class AngTest : public ICallbacks{
 			float relativ_x = (((float)x)/((float)WINDOW_WIDTH) - 0.5f) * 2.0f;
 			float relativ_y = (((float)y)/((float)WINDOW_HEIGHT) - 0.5f) * -2.0f;
 			m_mouse2DPos = Vector2f(relativ_x, relativ_y);
-			m_mousePos = calcWorldPos();
+			calcWorldPos();
 			initMouse();
 		}
 
 		virtual void MouseCB(int Button, int State, int x, int y){
 			
 			if (Button == 4 || Button == 3) {
-				
+				if(m_mouseVector.Dist(m_pGameCamera->GetPos() - worldPos) > 7.0f) {
+							return;
+						}				
 				if(State == GLUT_DOWN){
 					State = GLUT_UP;						
 					if(Button == 3){				//Mouse Scroll up
-						if(m_mouseVector.Dist(m_pGameCamera->GetPos() - worldPos) > 7.0f) {
-							return;
-						}
 						m_mouseVector += m_mouseVector * 0.01f;
 					}
 					else{						//Mouse Scroll down
-						if(m_mouseVector.Dist(m_pGameCamera->GetPos() - worldPos) < 4.0f) {
-							return;
-						}
 						m_mouseVector -= m_mouseVector * 0.01f;
 					}
 
@@ -336,7 +332,8 @@ class AngTest : public ICallbacks{
 							}
 							break;
 						case NOTHING:
-							m_UI.draw(calcWorldPos(), &m_oManager);
+							calcWorldPos();
+							m_UI.draw(m_mousePos, &m_oManager);
 							break;
 					}
 					
@@ -351,40 +348,23 @@ class AngTest : public ICallbacks{
 			}
 		}
 
-		Vector3f calcWorldPos(){
+		void calcWorldPos(){	
+			//printf("%f\n",m_mouseVector.Dist(m_pGameCamera->GetPos() - m_mouseVector));
 			
-			//float pi = (float) M_PI;
+			//m_pGameCamera->GetTarget().Print();
 
-			//float angleA = (x*1.0f) + (m_pGameCamera->m_AngleH) * (pi/180.0f);
-			//float angleB = (y*0.5f) + (m_pGameCamera->m_AngleV) * (pi/180.0f);
-			
-			
+			m_mousePos = m_pGameCamera->GetPos() - worldPos;
 
-			//printf("%f/%f/%f\n",m_pGameCamera->GetTarget().x,m_pGameCamera->GetTarget().y,m_pGameCamera->GetTarget().z);
+			m_mousePos += (m_pGameCamera->GetTarget() * m_mouseVector.Dist(m_pGameCamera->GetPos() - m_mouseVector));
 						
+			m_mousePos.x += (m_mouse2DPos.x * 2.0f) * m_pGameCamera->GetTarget().z;
+			m_mousePos.z += (m_mouse2DPos.x * 2.0f) * -m_pGameCamera->GetTarget().x;
 			
 
-			Vector3f vp = m_pGameCamera->GetPos() - worldPos;
+			//printf("%f/%f\n",sinf(m_pGameCamera->GetTarget().x),cosf(m_pGameCamera->GetTarget().x));
+
+			m_mousePos.y += (m_mouse2DPos.y * 1.0f);
 			
-				
-			float _x = vp.x + m_mouseVector.x + (m_mouse2DPos.x * 2.0f);
-			float _y = vp.y + m_mouseVector.y + (m_mouse2DPos.y * 1.0f);
-			float _z = vp.z + m_mouseVector.z;
-
-			/*
-			float _x = cosf(angleA)*v.x + sinf(angleA)*v.z;
-			float _y = v.y;
-			float _z = -sinf(angleA)*v.x + cosf(angleA)*v.z;
-
-			_x = _x; // + vp.x;
-			_y = cosf(angleB)*_y + sinf(angleB)*_z; // + vp.y;
-			_z = -sinf(angleB)*_y + cosf(angleB)*_z  + vp.z;
-			*/
-
-		
-			//Vector3f(_x, _y, _z).Print();
-
-			return Vector3f(_x, _y, _z);
 		}
 
 
