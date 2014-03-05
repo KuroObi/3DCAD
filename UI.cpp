@@ -56,11 +56,7 @@ void UI::draw(Vector3f _vertic, ObjectManager * p_oManager){
 			case tSQUAR:{
 				p_oManager->genarateSquare(drawingV[0], drawingV[1], drawingV[2]);
 			}
-			break;
-			case tQUAD:{
-			}
-			break;
-			
+			break;			
 		}
 		vCount = 0;
 	}

@@ -196,8 +196,6 @@ struct World{
 		numberOfTriangles++;
 		return;
 	};
-
-	//Triangle* giveTriangles{}; //Should return all Triangle Objects
 };
 
 
@@ -210,21 +208,14 @@ public:
 
 	void generateCordinateSystem();
 
-	void genaratePoint(float c_x1, float c_y1, float c_z1);
 	void genaratePoint(Vector3f _vertex0);
 
-	void genarateLine(float c_x1, float c_y1, float c_z1,float c_x2, float c_y2, float c_z2);
 	void genarateLine(Vector3f _vertex0, Vector3f _vertex1);
 	void genarateLine(Vector3f _vertex0, Vector3f _vertex1, Vector3f _color);
 
-	void genarateTriangle(float c_x1, float c_y1, float c_z1,float c_x2, float c_y2, float c_z2,float c_x3, float c_y3, float c_z3);
 	void genarateTriangle(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex3);
 
-	void genarateSquare(float c_x0, float c_y0, float c_z0, float c_x1, float c_y1, float c_z1, float c_x2, float c_y2, float c_z2);
 	void genarateSquare(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex3);
-
-	void generateQuad(float c_x0, float c_y0, float c_z0, float c_x1, float c_y1, float c_z1);
-	void generateQuad(float c_x0, float c_y0, float c_z0, float c_x1, float c_y1, float c_z1,float c_x2, float c_y2, float c_z2);
 
 	Vertex* getWorld();
 

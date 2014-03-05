@@ -21,6 +21,7 @@
 
 const static float STEP_SCALE = 0.1f;
 const static int MARGIN = 10;
+#define PI 3.14159265359f
 
 Camera::Camera(int WindowWidth, int WindowHeight, float EyeDistanz){
     m_windowWidth  = WindowWidth;
@@ -82,29 +83,30 @@ void Camera::Init(){
     glutWarpPointer(m_mousePos.x, m_mousePos.y);
 }
 
-float Camera::leftEye(float horoptor){
-	Vector3f Left = m_target.Cross(m_up);
-	Left.Normalize();
-	Left *= m_EyeStep;
-	m_pos += Left;
-
-	m_AngleH += horoptor;		
-	Update();
-	
-	return 0.0f;
-}
-
-float Camera::rightEye(float horoptor){
-	m_AngleH -= horoptor;		
-	Update();
-
+void Camera::rightEye(float horoptor){
 	Vector3f Right = m_up.Cross(m_target);
 	Right.Normalize();
 	Right *= m_EyeStep;
 	m_pos += Right;
 
-	return 0.0f;
+	float alphaHoroptor = atanf(horoptor/m_EyeStep) - PI/2;
+	
+	m_AngleH -= alphaHoroptor;		
+	Update();
 }
+
+void Camera::leftEye(float horoptor){
+	float alphaHoroptor = atanf(horoptor/m_EyeStep) - PI/2;
+	
+	m_AngleH += alphaHoroptor;		
+	Update();
+
+	Vector3f Left = m_target.Cross(m_up);
+	Left.Normalize();
+	Left *= m_EyeStep;
+	m_pos += Left;
+}
+
 
 bool Camera::OnKeyboard(int Key){
     bool Ret = false;

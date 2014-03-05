@@ -26,8 +26,7 @@ enum drawType{
 	tPOINT = 1,
 	tLINE = 2,
 	tTRI = 3,
-	tSQUAR = 13,
-	tQUAD = 23
+	tSQUAR = 13
 };
 
 

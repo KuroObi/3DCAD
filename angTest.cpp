@@ -79,9 +79,9 @@ class AngTest : public ICallbacks{
 			initGUI();
 			
 			m_mousePos = Vector3f(0.0, 0.0, 1.0);
-			m_mouseVector = Vector3f(0.0f, 0.0f, 1.0f);
 			m_mouse2DPos = Vector2f(0.0f, 0.0f);
-			horoptor = 1.0f;
+			m_horoptor = 1.1f;
+			m_horoptorStep = 0.05f;
 
 			initMouse();
 			
@@ -93,14 +93,6 @@ class AngTest : public ICallbacks{
 		}
 
 		virtual void RenderSceneCB(){
-
-			if(stereo){
-				horoptor = m_mouseVector.Dist(m_pGameCamera->GetPos() - worldPos);
-				//horoptor = 1.9f;
-				horoptor = atanf(eyeStep/horoptor) * 360.0f/PI;
-				printf("%f\n", horoptor);
-			}
-
 			m_pGameCamera->OnRender();
 			
 			m_pEffect->SetGUI(0);
@@ -127,16 +119,18 @@ class AngTest : public ICallbacks{
 			
 			glEnableVertexAttribArray(0);
 			glEnableVertexAttribArray(1);
+			/*
 			if(stereo == true){
 				glColorMask(GL_FALSE,GL_TRUE,GL_TRUE,GL_TRUE);
 			}
-
+			*/
 			glBindBuffer(GL_ARRAY_BUFFER, m_mouseVBO);
 
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
 			glDrawArrays(GL_LINES, 0, 6);
 			
+			/*
 			if(stereo == true){
 				m_pGameCamera->leftEye(horoptor);
 				glColorMask(GL_TRUE,GL_FALSE,GL_FALSE,GL_FALSE);
@@ -145,12 +139,14 @@ class AngTest : public ICallbacks{
 			
 				glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
 			}
-
+			*/
 			glDisableVertexAttribArray(0);		
 			glDisableVertexAttribArray(1);
+			/*
 			if(stereo == true){
 				m_pGameCamera->rightEye(horoptor);
 			}
+			*/
 		}
 
 		void GuiPhase(){
@@ -190,7 +186,6 @@ class AngTest : public ICallbacks{
 			m_pEffect->SetDirectionalLight(m_directionalLight);
 		
 			glEnableVertexAttribArray(0);
-			glEnableVertexAttribArray(1);
 			if(stereo == true){
 				glColorMask(GL_FALSE,GL_TRUE,GL_TRUE,GL_TRUE);
 				glEnableVertexAttribArray(1);
@@ -207,7 +202,7 @@ class AngTest : public ICallbacks{
 			glDrawBuffer(GL_BACK);
 
 			if(stereo == true){
-				m_pGameCamera->leftEye(horoptor);
+				m_pGameCamera->rightEye(m_horoptor);
 
 				p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
 				p.SetPerspectiveProj(60.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 100.0f);
@@ -220,14 +215,11 @@ class AngTest : public ICallbacks{
 				glDrawArrays(GL_TRIANGLES, m_oManager.sector.numberOfPoints+m_oManager.sector.numberOfLines*2, m_oManager.sector.numberOfTriangles*3);
 
 				glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
-			}
+				m_pGameCamera->leftEye(m_horoptor);
 
-			glDisableVertexAttribArray(1);
-			glDisableVertexAttribArray(0);
-			if(stereo == true){
 				glDisableVertexAttribArray(1);
-				m_pGameCamera->rightEye(horoptor);
 			}
+			glDisableVertexAttribArray(0);			
 		}
 
 		void mouseAction(){
@@ -261,7 +253,7 @@ class AngTest : public ICallbacks{
 							m_UI.changeDrawT(tTRI);
 							break;
 						case '4':
-							m_UI.changeDrawT(tQUAD);
+							m_UI.changeDrawT(tSQUAR);
 							break;
 						case 's':
 							if(stereo){
@@ -294,16 +286,16 @@ class AngTest : public ICallbacks{
 				if(State == GLUT_DOWN){
 					State = GLUT_UP;						
 					if(Button == 3){				//Mouse Scroll up
-						if(m_mouseVector.Dist(m_pGameCamera->GetPos() - worldPos) > 7.0f) {
+						if(m_horoptor > 7.0f){
 							return;
 						}
-						m_mouseVector += m_mouseVector * 0.01f;
+						m_horoptor += m_horoptorStep;
 					}
 					else{						//Mouse Scroll down
-						if(m_mouseVector.Dist(m_pGameCamera->GetPos() - worldPos) <= 3.0f) {
+						if(m_horoptor <= 1.1f){
 							return;
 						}
-						m_mouseVector -= m_mouseVector * 0.01f;
+						m_horoptor -= m_horoptorStep;
 					}
 
 					calcWorldPos();
@@ -316,6 +308,7 @@ class AngTest : public ICallbacks{
 			if (Button == GLUT_LEFT_BUTTON) {
 				
 				if(State == GLUT_DOWN){
+					State = GLUT_UP;
 					float relativ_x = (((float)x)/((float)WINDOW_WIDTH) - 0.5f) * 2.0f;
 					float relativ_y = (((float)y)/((float)WINDOW_HEIGHT) - 0.5f) * -2.0f;
 		
@@ -337,7 +330,7 @@ class AngTest : public ICallbacks{
 							m_UI.changeDrawT(tTRI);
 							break;
 						case QAD:
-							m_UI.changeDrawT(tQUAD);
+							m_UI.changeDrawT(tSQUAR);
 							break;
 						case STEREO:
 							if(stereo){
@@ -352,11 +345,7 @@ class AngTest : public ICallbacks{
 							break;
 					}
 					
-
-
-					
 					CreateVertexBuffer();
-					State = GLUT_UP;
 					
 					return;
 				}
@@ -366,8 +355,8 @@ class AngTest : public ICallbacks{
 		void calcWorldPos(){	
 			m_mousePos = m_pGameCamera->GetPos() - worldPos;
 
-			m_mousePos += (m_pGameCamera->GetTarget() * m_mouseVector.Dist(m_pGameCamera->GetPos() - m_mouseVector));
-						
+			m_mousePos += (m_pGameCamera->GetTarget() * m_horoptor);
+
 			m_mousePos.x += (m_mouse2DPos.x * 2.0f) * m_pGameCamera->GetTarget().z;
 			m_mousePos.z += (m_mouse2DPos.x * 2.0f) * -m_pGameCamera->GetTarget().x;
 
@@ -482,11 +471,11 @@ class AngTest : public ICallbacks{
 		UI m_UI;
 		gui m_gui;
 		Vector3f m_mousePos;
-		Vector3f m_mouseVector;
 		Vector2f m_mouse2DPos;
 
 		float eyeStep;
-		float horoptor;
+		float m_horoptor;
+		float m_horoptorStep;
 
 		bool stereo;
 		bool turnAround;

@@ -47,9 +47,9 @@ class Camera{
 			return m_up;
 		}
 	
-		float leftEye(float horoptor);
+		void leftEye(float horoptor);
 
-		float rightEye(float horoptor);
+		void rightEye(float horoptor);
 
 		float m_AngleH;
 		float m_AngleV;
