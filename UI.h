@@ -26,7 +26,8 @@ enum drawType{
 	tPOINT = 1,
 	tLINE = 2,
 	tTRI = 3,
-	tSQUAR = 13
+	tSQUAR = 13,
+	tREMOVE = -1
 };
 
 
@@ -45,6 +46,9 @@ class UI{
 		drawType drawT;
 		Vector3f drawingV[3];
 		int	vCount;
+
+		Obj checkSourounding(Vector3f _vertic, World sector);
+
 };
 
 

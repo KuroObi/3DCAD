@@ -33,7 +33,6 @@
 
 #define WINDOW_WIDTH  1600
 #define WINDOW_HEIGHT 900
-#define PI 3.14159265359f
 
 class AngTest : public ICallbacks{
 	public:
@@ -97,20 +96,19 @@ class AngTest : public ICallbacks{
 			
 			m_pEffect->SetGUI(0);
 			RenderPhase();
-			
+				
+			m_pEffect->SetGUI(0);
+			MousePhase(); 
+
 			//Disable 3D-Things
 			glDisable(GL_DEPTH_TEST);
-			//glDisable(GL_CULL_FACE);
 			
 			m_pEffect->SetGUI(1);
 			GuiPhase();
 			
 			//Reaktivate 3D-Things
-			//glEnable(GL_CULL_FACE);
 			glEnable(GL_DEPTH_TEST);
-			
-			m_pEffect->SetGUI(0);
-			MousePhase(); 
+		
 
 			glutSwapBuffers();
 		}
@@ -262,6 +260,9 @@ class AngTest : public ICallbacks{
 								stereo = true;
 							}
 							break;
+						case 'r':
+							m_UI.changeDrawT(tREMOVE);
+							break;
 					}
 		}
 
@@ -369,13 +370,13 @@ class AngTest : public ICallbacks{
 		void initGUI(){
 			m_gui.init();
 			int numberOfButtons = m_gui.numOfButtons;
-			int sizeVertices = numberOfButtons* 4 * 12 * 2;
+			int sizeVertices = numberOfButtons* 4 * 14 * 2;
 			Vertex * guiVert;
 			guiVert = new Vertex[numberOfButtons * 4];
 
 			for(int c = 0; c < numberOfButtons; c++){
 				for(int v = 0; v < 4 ; v++){
-					guiVert[c*4 + v] = Vertex(m_gui.button[c].vertex[v].getVector3f(),Vector3f(1.0f,0.0f,0.0f));
+					guiVert[c*4 + v] = Vertex(m_gui.button[c].vertex[v].getVector3f(),Vector4f(1.0f, 1.0f, 0.1f, 1.0f));
 				}
 			}
 						
@@ -390,18 +391,18 @@ class AngTest : public ICallbacks{
 			Vertex * vcMouse;
 			vcMouse = new Vertex[6];
 
-			vcMouse[0] = Vertex(m_mousePos - Vector3f(0.05f,0.0f,0.0f) , Vector3f(1.0f,1.0f,1.0f));
-			vcMouse[1] = Vertex(m_mousePos - Vector3f(-0.05f,0.0f,0.0f), Vector3f(1.0f,1.0f,1.0f));
+			vcMouse[0] = Vertex(m_mousePos - Vector3f(0.05f,0.0f,0.0f) , Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+			vcMouse[1] = Vertex(m_mousePos - Vector3f(-0.05f,0.0f,0.0f), Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
 
-			vcMouse[2] = Vertex(m_mousePos - Vector3f(0.0f,0.05f,0.0f) , Vector3f(1.0f,1.0f,1.0f));
-			vcMouse[3] = Vertex(m_mousePos - Vector3f(0.0f,-0.05f,0.0f), Vector3f(1.0f,1.0f,1.0f));
+			vcMouse[2] = Vertex(m_mousePos - Vector3f(0.0f,0.05f,0.0f) , Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+			vcMouse[3] = Vertex(m_mousePos - Vector3f(0.0f,-0.05f,0.0f), Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
 
-			vcMouse[4] = Vertex(m_mousePos - Vector3f(0.0f,0.0f,0.05f) , Vector3f(1.0f,1.0f,1.0f));
-			vcMouse[5] = Vertex(m_mousePos - Vector3f(0.0f,0.0f,-0.05f), Vector3f(1.0f,1.0f,1.0f));
+			vcMouse[4] = Vertex(m_mousePos - Vector3f(0.0f,0.0f,0.05f) , Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+			vcMouse[5] = Vertex(m_mousePos - Vector3f(0.0f,0.0f,-0.05f), Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
 
 			glGenBuffers(1, &m_mouseVBO);
 			glBindBuffer(GL_ARRAY_BUFFER, m_mouseVBO);
-			glBufferData(GL_ARRAY_BUFFER, 2 * 6 * 12, vcMouse, GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, 2 * 6 * 14, vcMouse, GL_DYNAMIC_DRAW);
 		}
 
 		void CreateVertexBuffer(){
@@ -409,8 +410,8 @@ class AngTest : public ICallbacks{
 			int numLi = m_oManager.sector.numberOfLines;
 			int numTri = m_oManager.sector.numberOfTriangles;
 			int cVertes = 0;
-			int sizeVertices = (numPoi + numLi*2 + numTri*3) * 12 * 2;
-			//printf("%i",numLi);
+			int sizeVertices = (numPoi + numLi*2 + numTri*3) * 14 * 2;
+
 			Vertex * Vertices;
 			Vertices = new Vertex[numPoi + numLi*2 + numTri*3];
 			
@@ -419,19 +420,15 @@ class AngTest : public ICallbacks{
 			Triangle * thisTriangle = m_oManager.sector.HeadTriangle;
 			
 			
-			for(int cPoi = 0; cPoi < numPoi; cPoi++){
-				Vertices[cVertes] = Vertex(	thisPoint->vertex[0].xyz,
-											thisPoint->vertex[0].rgb);
-				cVertes++;
+			for(int cPoi = 0; cPoi < numPoi; cPoi++, cVertes++){
+				Vertices[cVertes] = thisPoint->vertex[0];
 				if(thisPoint->nextPoint != NULL){
 					thisPoint = thisPoint->nextPoint;
 				}
 			}
 			for(int cLi = 0; cLi < numLi; cLi++){
-				for(int cThisVertice = 0; cThisVertice < 2; cThisVertice++){
-					Vertices[cVertes] = Vertex(	thisLine->vertex[cThisVertice].xyz,
-												thisLine->vertex[cThisVertice].rgb);
-					cVertes++;
+				for(int cThisVertice = 0; cThisVertice < 2; cThisVertice++, cVertes++){
+					Vertices[cVertes] = thisLine->vertex[cThisVertice];
 				}
 				if(thisLine->nextLine == NULL){
 					break;
@@ -440,20 +437,18 @@ class AngTest : public ICallbacks{
 				}
 			}	
 			for(int cTri = 0; cTri < numTri; cTri++){
-				for(int cThisVertice = 0; cThisVertice < 3; cThisVertice++){
-					Vertices[cVertes] = Vertex(	thisTriangle->vertex[cThisVertice].xyz,
-												thisTriangle->vertex[cThisVertice].rgb);
-					cVertes++;
+				for(int cThisVertice = 0; cThisVertice < 3; cThisVertice++, cVertes++){
+					Vertices[cVertes] = thisTriangle->vertex[cThisVertice];
 				}
 				if(thisTriangle->nextTriangle == NULL){
 					break;
 				}else{
 					thisTriangle = thisTriangle->nextTriangle;
 				}
-			}	
+			}
 			glGenBuffers(1, &m_VBO);
 			glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-			glBufferData(GL_ARRAY_BUFFER, sizeVertices, Vertices, GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeVertices, Vertices, GL_STATIC_DRAW);
 		}
 		
 	//Variables

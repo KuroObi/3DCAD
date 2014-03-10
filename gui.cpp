@@ -20,10 +20,6 @@
 
 
 void gui::init(){
-	mouse  = Triangle(	Vector3f(0.0f, 0.0f, 0.0f),
-						Vector3f(0.03f, -0.01f, 0.0f),
-						Vector3f(0.01f, -0.06f, 0.0f));
-
 	button[0] = Button(	Vector3f(-0.95f, 0.8f, 0.0f),
 						Vector3f(-0.8f, 0.95f, 0.0f),
 						NEW);

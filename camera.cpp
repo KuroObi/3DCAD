@@ -19,9 +19,9 @@
 
 #include "camera.h"
 
+
 const static float STEP_SCALE = 0.1f;
 const static int MARGIN = 10;
-#define PI 3.14159265359f
 
 Camera::Camera(int WindowWidth, int WindowHeight, float EyeDistanz){
     m_windowWidth  = WindowWidth;
@@ -32,8 +32,8 @@ Camera::Camera(int WindowWidth, int WindowHeight, float EyeDistanz){
     m_up           = Vector3f(0.0f, 1.0f, 0.0f);
 
 	m_EyeStep   = EyeDistanz;
-
-    Init();
+   
+	Init();
 }
 
 Camera::Camera(int WindowWidth, int WindowHeight, const Vector3f& Pos, const Vector3f& Target, const Vector3f& Up, float EyeDistanz){

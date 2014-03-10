@@ -27,8 +27,14 @@
 #include <math.h>
 #endif
 
-#define ToRadian(x) (float)(((x) * M_PI / 180.0f))
-#define ToDegree(x) (float)(((x) * 180.0f / M_PI))
+#define PI 3.14159265359f
+
+#define ToRadian(x) (float)(((x) * PI / 180.0f))
+#define ToDegree(x) (float)(((x) * 180.0f / PI))
+
+#define dot(u,v)   ((u).x * (v).x + (u).y * (v).y + (u).z * (v).z) // dot product (3D) which allows vector operations in arguments
+#define norm(v)     sqrt(dot(v,v))     // norm = length of  vector
+#define d(u,v)      norm(u-v)          // distance = norm of difference
 
 struct Vector2i{
     int x;
@@ -93,7 +99,7 @@ struct Vector3f{
     Vector3f Cross(const Vector3f& v) const;
 
     Vector3f& Normalize();
-
+	
 	float Dist(Vector3f& v);
 
     void Rotate(float Angle, const Vector3f& Axis);
@@ -101,6 +107,46 @@ struct Vector3f{
     void Print() const
     {
         printf("(%.02f, %.02f, %.02f)\n", x, y, z);
+    }
+};
+
+struct Vector4f{
+    float x;
+    float y;
+    float z;
+	float a;
+
+    Vector4f(){
+    }
+
+    Vector4f(float _x, float _y, float _z, float _a){
+        x = _x;
+        y = _y;
+        z = _z;
+		a = _a;
+    }
+	
+    Vector4f& operator+=(const Vector4f& _r){
+        x += _r.x;
+        y += _r.y;
+        z += _r.z;
+		a += _r.a;
+
+        return *this;
+    }
+
+    Vector4f& operator-=(const Vector4f& _r){
+        x -= _r.x;
+        y -= _r.y;
+        z -= _r.z;
+		a -= _r.a;
+
+        return *this;
+    }
+
+    void Print() const
+    {
+        printf("(%.02f, %.02f, %.02f, %.02f)\n", x, y, z, a);
     }
 };
 
@@ -217,6 +263,8 @@ struct Quaternion
 Quaternion operator*(const Quaternion& l, const Quaternion& r);
 
 Quaternion operator*(const Quaternion& q, const Vector3f& v);
+
+float calcDistPoiLin(Vector3f _vertic, Vector3f _L0, Vector3f L1);
 
 #endif	/* MATH_3D_H */
 

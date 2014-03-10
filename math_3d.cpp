@@ -168,3 +168,33 @@ Quaternion operator*(const Quaternion& q, const Vector3f& v){
 
     return ret;
 }
+
+
+float calcDistPoiLin(Vector3f vertic, Vector3f L0, Vector3f L1) {
+
+	float dist;
+	Vector3f v = L1 - L0;
+	Vector3f w = L0 - vertic;
+
+	Vector3f n = v.Cross(w);
+	
+	dist = norm(n)/norm(v);
+
+	return dist;
+	/*
+	Vector3f v = L1 - L0;
+	Vector3f w = vertic - L0;
+
+	float c1 = dot(w,v);
+	if ( c1 <= 0 )
+		return vertic.Dist(L0);
+
+	float c2 = dot(v,v);
+	if ( c2 <= c1 )
+		return vertic.Dist(L1);
+
+	float b = c1 / c2;
+	Vector3f Pb = L0 + v * b;
+		return  d(vertic, Pb);
+	*/
+}

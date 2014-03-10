@@ -22,7 +22,7 @@ static const char* pVS = "                                                      
 #version 330                                                                        \n\
                                                                                     \n\
 layout (location = 0) in vec3 Position;                                             \n\
-layout (location = 1) in vec3 Color;												\n\
+layout (location = 1) in vec4 Color;												\n\
                                                                                     \n\
 uniform mat4 gWVP;                                                                  \n\
 uniform int gui;																	\n\
@@ -34,16 +34,20 @@ void main()                                                                     
 	switch (gui){																	\n\
 		case 0:																		\n\
 			gl_Position = gWVP * vec4(Position, 1.0);		                        \n\
-			frag_color = vec4(Color, 1.0);											\n\
+			frag_color = Color;														\n\
 			break;																	\n\
 		case 1:																		\n\
 			gl_Position = vec4(Position, 1.0);										\n\
-			frag_color = vec4(Color, 1.0);											\n\
+			frag_color = Color;														\n\
 			break;																	\n\
 	}																				\n\
 }";
 
-/*		next Step -> Textures
+/*	
+
+
+
+next Step -> Textures
 static const char* pVS0 = "                                                         \n\
 #version 330                                                                        \n\
                                                                                     \n\

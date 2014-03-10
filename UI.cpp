@@ -19,7 +19,6 @@
 
 #include "UI.h"
 
-
 UI::UI(){
 	drawT = tTRI;
 	vCount = 0;
@@ -30,9 +29,94 @@ void UI::changeDrawT(drawType _drawT){
 	
 }
 
+Obj checkSourounding(Vector3f _vertic, World sector){
+	Point fPoint;
+
+	//fPoint = *sector.HeadPoint;
+	//while(Point-> ){
+	//
+	//}
+	return fPoint;
+}
+
 void UI::draw(Vector3f _vertic, ObjectManager * p_oManager){
 	
-	if(vCount <= 1 && _vertic.Dist(drawingV[vCount-1]) <= 0.05f ){
+	Obj * oj = new Obj;
+
+	if(drawT == tREMOVE){
+		float genauigkeit = 0.025f;	//change name and ajust value
+
+		//Check for Point
+		if(p_oManager->sector.numberOfPoints > 0){
+			
+			Point * nP = new Point;
+			nP = p_oManager->sector.HeadPoint;
+
+			for(int cPoi = 0; cPoi < p_oManager->sector.numberOfPoints; cPoi++){
+				if(_vertic.z < nP->vertex->xyz.z+genauigkeit && _vertic.z > nP->vertex->xyz.z-genauigkeit){
+					if(_vertic.y < nP->vertex->xyz.y+genauigkeit && _vertic.y > nP->vertex->xyz.y-genauigkeit){
+						if(_vertic.x < nP->vertex->xyz.x+genauigkeit && _vertic.x > nP->vertex->xyz.x-genauigkeit){
+							p_oManager->sector.removePoint(nP);
+							return;
+						}
+					}
+				}
+				nP = nP->nextPoint;
+			}
+		}
+		//Check for Line
+		if(p_oManager->sector.numberOfLines > 9){
+			
+			Line * nL = new Line;
+			nL = p_oManager->sector.HeadLine;
+
+			for(int n = 0; n < 9; n++)
+				nL = nL->nextLine;
+
+			float dist;
+
+			for(int cLin = 9; cLin < p_oManager->sector.numberOfLines; cLin++){
+
+				dist = calcDistPoiLin(_vertic, nL->vertex[0].getVector3f(), nL->vertex[1].getVector3f());
+				printf("\ndist: %f", dist);
+				
+				/*
+				if(_vertic.z < nL->vertex->xyz.z+genauigkeit && _vertic.z > nL->vertex->xyz.z-genauigkeit){
+					if(_vertic.y < nL->vertex->xyz.y+genauigkeit && _vertic.y > nL->vertex->xyz.y-genauigkeit){
+						if(_vertic.x < nL->vertex->xyz.x+genauigkeit && _vertic.x > nL->vertex->xyz.x-genauigkeit){
+							nL->vertex->xyz.Print();
+							p_oManager->sector.removeLine(nL);
+							return;
+						}
+					}
+				}*/
+				nL = nL->nextLine;
+			}
+		}
+		//Check for Triangle
+		if(p_oManager->sector.numberOfTriangles > 0){
+			
+			Triangle * nT = new Triangle;
+			nT = p_oManager->sector.HeadTriangle;
+
+			for(int cTri = 0; cTri < p_oManager->sector.numberOfTriangles; cTri++){
+				if(_vertic.z < nT->vertex->xyz.z+genauigkeit && _vertic.z > nT->vertex->xyz.z-genauigkeit){
+					if(_vertic.y < nT->vertex->xyz.y+genauigkeit && _vertic.y > nT->vertex->xyz.y-genauigkeit){
+						if(_vertic.x < nT->vertex->xyz.x+genauigkeit && _vertic.x > nT->vertex->xyz.x-genauigkeit){
+							nT->vertex->xyz.Print();
+							p_oManager->sector.removeTriangle(nT);
+							return;
+						}
+					}
+				}
+				nT = nT->nextTriangle;
+			}
+		}
+	}
+		//oj = &checkSourounding(_vertic, p_oManager->sector);
+	//printf("%i", oj);
+
+	if(vCount <= 1 && _vertic.Dist(drawingV[vCount-1]) <= 0.05f){
 		return;
 	}
 

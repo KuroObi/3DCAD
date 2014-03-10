@@ -68,9 +68,6 @@ public:
 
 	int numOfButtons;
 	Button* button;
-
-	Triangle mouse;
-
 };
 
 
