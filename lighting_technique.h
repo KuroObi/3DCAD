@@ -37,6 +37,7 @@ class LightingTechnique : public Technique{
 		void SetWVP(const Matrix4f& WVP);
 		void SetDirectionalLight(const DirectionalLight& Light);
 		void SetGUI(int _gui);
+		void SetTextureUnit(unsigned int TextureUnit);
 
 	private:
 
@@ -44,6 +45,7 @@ class LightingTechnique : public Technique{
 		GLuint m_dirLightColorLocation;
 		GLuint m_dirLightAmbientIntensityLocation;
 		GLuint m_GUILocation;
+		GLuint m_samplerLocation;
 		//GLuint m_MVectorLocation;
 };
 

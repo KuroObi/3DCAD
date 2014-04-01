@@ -22,6 +22,10 @@
 #include <math.h>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+#include <gl\gl.h>			// Header File For The OpenGL32 Library
+#include <gl\glu.h>			// Header File For The GLu32 Library
+#include <IL\il.h>
+//#include <IL/il.h>			//DevIl lib
 
 #include "pipeline.h"
 #include "camera.h"
@@ -30,6 +34,8 @@
 #include "lighting_technique.h"
 #include "glut_backend.h"
 #include "gui.h"
+
+GLuint vao, textureID;
 
 #define WINDOW_WIDTH  1600
 #define WINDOW_HEIGHT 900
@@ -41,8 +47,6 @@ class AngTest : public ICallbacks{
 			m_scale = 0.0f;
 		    m_directionalLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
 		    m_directionalLight.AmbientIntensity = 1.0f;	
-
-			
 		}
 		
 		~AngTest(){
@@ -57,7 +61,7 @@ class AngTest : public ICallbacks{
 			Vector3f Target(0.0f, -0.2f, 1.0f);
 			Vector3f Up(0.0, 0.0f, 0.0f);
 
-			eyeStep = 0.2f;
+			eyeStep = 0.1f;
 
 			worldPos = Vector3f(0.0f, 0.0f, 3.0f);
 			m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, eyeStep);
@@ -72,6 +76,8 @@ class AngTest : public ICallbacks{
 			}
 
 			m_pEffect->Enable();
+
+			m_pEffect->SetTextureUnit(0);
 	
 			stereo = false;
 			turnAround = false;
@@ -84,6 +90,15 @@ class AngTest : public ICallbacks{
 
 			initMouse();
 			
+			/*
+
+	        GLuint Texture = loadBMP_custom("vtr.bmp");
+       
+	        // Get a handle for our "myTextureSampler" uniform
+		    GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
+			*/
+		
+
 			return true;
 		}
 
@@ -96,20 +111,15 @@ class AngTest : public ICallbacks{
 			
 			m_pEffect->SetGUI(0);
 			RenderPhase();
-				
-			m_pEffect->SetGUI(0);
 			MousePhase(); 
 
-			//Disable 3D-Things
-			glDisable(GL_DEPTH_TEST);
+			glDisable(GL_DEPTH_TEST);			//Disable 3D-Things
 			
 			m_pEffect->SetGUI(1);
 			GuiPhase();
 			
-			//Reaktivate 3D-Things
-			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_DEPTH_TEST);			//Reaktivate 3D-Things
 		
-
 			glutSwapBuffers();
 		}
 
@@ -152,11 +162,13 @@ class AngTest : public ICallbacks{
 			glEnableVertexAttribArray(0);
 			glEnableVertexAttribArray(1);
 			glBindBuffer(GL_ARRAY_BUFFER, m_guiVBO);
+			
 
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
 			glDrawArrays(GL_QUADS, 0,m_gui.numOfButtons * 4);
 			
+
 			glDisableVertexAttribArray(1);
 			glDisableVertexAttribArray(0);
 
@@ -184,9 +196,9 @@ class AngTest : public ICallbacks{
 			m_pEffect->SetDirectionalLight(m_directionalLight);
 		
 			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
 			if(stereo == true){
 				glColorMask(GL_FALSE,GL_TRUE,GL_TRUE,GL_TRUE);
-				glEnableVertexAttribArray(1);
 			}
 			glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 
@@ -213,11 +225,10 @@ class AngTest : public ICallbacks{
 				glDrawArrays(GL_TRIANGLES, m_oManager.sector.numberOfPoints+m_oManager.sector.numberOfLines*2, m_oManager.sector.numberOfTriangles*3);
 
 				glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
-				m_pGameCamera->leftEye(m_horoptor);
-
-				glDisableVertexAttribArray(1);
+				m_pGameCamera->leftEye(m_horoptor);	
 			}
 			glDisableVertexAttribArray(0);			
+			glDisableVertexAttribArray(1);
 		}
 
 		void mouseAction(){
@@ -242,15 +253,19 @@ class AngTest : public ICallbacks{
 							exit(0);
 							break;
 						case '1':
+							m_UI.reset_vCount();
 							m_UI.changeDrawT(tPOINT);
 							break;
 						case '2':
+							m_UI.reset_vCount();
 							m_UI.changeDrawT(tLINE);
 							break;
 						case '3':
+							m_UI.reset_vCount();
 							m_UI.changeDrawT(tTRI);
 							break;
 						case '4':
+							m_UI.reset_vCount();
 							m_UI.changeDrawT(tSQUAR);
 							break;
 						case 's':
@@ -261,6 +276,7 @@ class AngTest : public ICallbacks{
 							}
 							break;
 						case 'r':
+							m_UI.reset_vCount();
 							m_UI.changeDrawT(tREMOVE);
 							break;
 					}
@@ -333,6 +349,9 @@ class AngTest : public ICallbacks{
 						case QAD:
 							m_UI.changeDrawT(tSQUAR);
 							break;
+						case REM:
+							m_UI.changeDrawT(tREMOVE);
+							break;
 						case STEREO:
 							if(stereo){
 								stereo = false;
@@ -370,16 +389,17 @@ class AngTest : public ICallbacks{
 		void initGUI(){
 			m_gui.init();
 			int numberOfButtons = m_gui.numOfButtons;
-			int sizeVertices = numberOfButtons* 4 * 14 * 2;
+			int sizeVertices = numberOfButtons* 4 * 12 * 2;
 			Vertex * guiVert;
 			guiVert = new Vertex[numberOfButtons * 4];
-
+			
 			for(int c = 0; c < numberOfButtons; c++){
-				for(int v = 0; v < 4 ; v++){
-					guiVert[c*4 + v] = Vertex(m_gui.button[c].vertex[v].getVector3f(),Vector4f(1.0f, 1.0f, 0.1f, 1.0f));
-				}
+				guiVert[c*4 + 0] = m_gui.button[c].vertex[0];
+				guiVert[c*4 + 1] = m_gui.button[c].vertex[1];
+				guiVert[c*4 + 2] = m_gui.button[c].vertex[2];
+				guiVert[c*4 + 3] = m_gui.button[c].vertex[3];
 			}
-						
+
 			glGenBuffers(1, &m_guiVBO);
 			glBindBuffer(GL_ARRAY_BUFFER, m_guiVBO);
 			glBufferData(GL_ARRAY_BUFFER, sizeVertices, guiVert, GL_STATIC_DRAW);
@@ -391,18 +411,18 @@ class AngTest : public ICallbacks{
 			Vertex * vcMouse;
 			vcMouse = new Vertex[6];
 
-			vcMouse[0] = Vertex(m_mousePos - Vector3f(0.05f,0.0f,0.0f) , Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
-			vcMouse[1] = Vertex(m_mousePos - Vector3f(-0.05f,0.0f,0.0f), Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+			vcMouse[0] = Vertex(m_mousePos - Vector3f(0.05f,0.0f,0.0f) , Vector3f(1.0f, 1.0f, 1.0f));
+			vcMouse[1] = Vertex(m_mousePos - Vector3f(-0.05f,0.0f,0.0f), Vector3f(1.0f, 1.0f, 1.0f));
 
-			vcMouse[2] = Vertex(m_mousePos - Vector3f(0.0f,0.05f,0.0f) , Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
-			vcMouse[3] = Vertex(m_mousePos - Vector3f(0.0f,-0.05f,0.0f), Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+			vcMouse[2] = Vertex(m_mousePos - Vector3f(0.0f,0.05f,0.0f) , Vector3f(1.0f, 1.0f, 1.0f));
+			vcMouse[3] = Vertex(m_mousePos - Vector3f(0.0f,-0.05f,0.0f), Vector3f(1.0f, 1.0f, 1.0f));
 
-			vcMouse[4] = Vertex(m_mousePos - Vector3f(0.0f,0.0f,0.05f) , Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
-			vcMouse[5] = Vertex(m_mousePos - Vector3f(0.0f,0.0f,-0.05f), Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+			vcMouse[4] = Vertex(m_mousePos - Vector3f(0.0f,0.0f,0.05f) , Vector3f(1.0f, 1.0f, 1.0f));
+			vcMouse[5] = Vertex(m_mousePos - Vector3f(0.0f,0.0f,-0.05f), Vector3f(1.0f, 1.0f, 1.0f));
 
 			glGenBuffers(1, &m_mouseVBO);
 			glBindBuffer(GL_ARRAY_BUFFER, m_mouseVBO);
-			glBufferData(GL_ARRAY_BUFFER, 2 * 6 * 14, vcMouse, GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, 2 * 6 * 12, vcMouse, GL_DYNAMIC_DRAW);
 		}
 
 		void CreateVertexBuffer(){
@@ -410,7 +430,7 @@ class AngTest : public ICallbacks{
 			int numLi = m_oManager.sector.numberOfLines;
 			int numTri = m_oManager.sector.numberOfTriangles;
 			int cVertes = 0;
-			int sizeVertices = (numPoi + numLi*2 + numTri*3) * 14 * 2;
+			int sizeVertices = (numPoi + numLi*2 + numTri*3) * 12 * 2;
 
 			Vertex * Vertices;
 			Vertices = new Vertex[numPoi + numLi*2 + numTri*3];
@@ -429,6 +449,7 @@ class AngTest : public ICallbacks{
 			for(int cLi = 0; cLi < numLi; cLi++){
 				for(int cThisVertice = 0; cThisVertice < 2; cThisVertice++, cVertes++){
 					Vertices[cVertes] = thisLine->vertex[cThisVertice];
+					printf("\n%f	%f	%f", Vertices[cVertes].rgb.x, Vertices[cVertes].rgb.y, Vertices[cVertes].rgb.z);
 				}
 				if(thisLine->nextLine == NULL){
 					break;
@@ -476,9 +497,117 @@ class AngTest : public ICallbacks{
 		bool turnAround;
 
 		Vector3f worldPos;
+
 };
 
+
+
+// ------------------------------------------------------------
+//
+//			Loading the image
+//
+// ------------------------------------------------------------
+
+unsigned int ilLoadImage(std::string filename) {
+
+	ILboolean success;
+	unsigned int imageID;
+ 
+	// init DevIL. This needs to be done only once per application
+	ilInit();
+	// generate an image name
+	ilGenImages(1, &imageID); 
+	// bind it
+	ilBindImage(imageID); 
+	// match image origin to OpenGL’s
+	ilEnable(IL_ORIGIN_SET);
+	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+	// load  the image
+	success = ilLoadImage((ILstring)filename.c_str());
+	ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+	// check to see if everything went OK
+	if (!success) {
+		ilDeleteImages(1, &imageID); 
+		return 0;
+	}
+	else return imageID;
+}
+
+
+// ------------------------------------------------------------
+//
+//			Prepare texture
+//
+// ------------------------------------------------------------
+
+void prepareTexture(int w, int h, unsigned char* data) {
+
+	
+
+	/* Create and load texture to OpenGL */
+	glGenTextures(1, &textureID); /* Texture name generation */
+	glBindTexture(GL_TEXTURE_2D, textureID); 
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 
+                w, h, 
+                0, GL_RGBA, GL_UNSIGNED_BYTE,
+                data); 
+	glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+
+void showAtt(){
+	
+	printf("Width: %d, Height %d, Bytes per Pixel %d",
+            ilGetInteger(IL_IMAGE_WIDTH),
+            ilGetInteger(IL_IMAGE_HEIGHT),
+            ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL));
+ 
+std::string s;
+switch(ilGetInteger(IL_IMAGE_FORMAT)) {
+    case IL_COLOR_INDEX      : s =  "IL_COLOR_INDEX"; break;    
+    case IL_ALPHA            : s =  "IL_ALPHA"; break; 
+    case IL_RGB              : s =  "IL_RGB"; break;    
+    case IL_RGBA             : s =  "IL_RGBA"; break;    
+    case IL_BGR              : s =  "IL_BGR"; break;    
+    case IL_BGRA             : s =  "IL_BGRA"; break;    
+    case IL_LUMINANCE        : s =  "IL_LUMINANCE"; break;    
+    case  IL_LUMINANCE_ALPHA : s =  "IL_LUMINANCE_ALPHA"; break;
+}
+printf(" Format %s", s.c_str());
+ 
+switch(ilGetInteger(IL_IMAGE_TYPE)) {
+    case IL_BYTE           : s =  "IL_BYTE"; break;    
+    case IL_UNSIGNED_BYTE  : s =  "IL_UNSIGNED_BYTE"; break;   
+    case IL_SHORT          : s =  "IL_SHORT"; break;    
+    case IL_UNSIGNED_SHORT : s =  "IL_UNSIGNED_SHORT"; break;    
+    case IL_INT            : s =  "IL_INT"; break;    
+    case IL_UNSIGNED_INT   : s =  "IL_UNSIGNED_INT"; break;    
+    case IL_FLOAT          : s =  "IL_FLOAT"; break;    
+    case IL_DOUBLE         : s =  "IL_DOUBLE"; break;
+    case IL_HALF           : s =  "IL_HALF"; break;
+}
+printf(" Data type:  %s", s.c_str());
+
+
+}
+
 int main(int argc, char** argv){
+
+	int w,h,id;
+	unsigned char* data;
+
+	// load image first so that window opens with image size
+	id = ilLoadImage("textures.jpg");	//("test.png");
+	// image not loaded
+	if (id == 0)
+		return(2);
+
+	ilBindImage(id);
+	w = ilGetInteger(IL_IMAGE_WIDTH);
+	h = ilGetInteger(IL_IMAGE_HEIGHT);
+	data = ilGetData();
+	
+
     GLUTBackendInit(argc, argv);
 
 	bool fullScreen = false;
@@ -493,7 +622,12 @@ int main(int argc, char** argv){
 	if (!aTest->Init()){
         return 0x12;
     }
-	
+
+		prepareTexture(w,h,data);
+
+
+	//showAtt(); //just for showing off some pic data
+
 
 	aTest->Run();
 

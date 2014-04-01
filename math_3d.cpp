@@ -25,6 +25,11 @@ Vector3f Vector3f::Cross(const Vector3f& v) const{
     return Vector3f(_x, _y, _z);
 }
 
+float Vector3f::Skalar(Vector3f& v){
+
+	return ((x*v.x) + (y*v.y) + (z*v.z));
+}
+
 Vector3f& Vector3f::Normalize(){
     const float Length = sqrtf(x * x + y * y + z * z);
 
@@ -170,31 +175,43 @@ Quaternion operator*(const Quaternion& q, const Vector3f& v){
 }
 
 
-float calcDistPoiLin(Vector3f vertic, Vector3f L0, Vector3f L1) {
+float calcDistPoiLin(Vector3f vertic, Vector3f L0, Vector3f L1){
+    Vector3f diff = vertic-L0;
+    Vector3f dir = L1-L0;
+    float dot1 = dot(diff,dir);
+    if (dot1 <= 0.0f)
+        return L0.Dist(vertic);
 
-	float dist;
-	Vector3f v = L1 - L0;
-	Vector3f w = L0 - vertic;
+	float dot2 = dot(dir,dir);
+    if (dot2 <= dot1)
+        return L1.Dist(vertic);
 
-	Vector3f n = v.Cross(w);
+    float t=dot1/dot2;
+	return (L0 + dir*t).Dist(vertic);
+}
+
+float calcDistPoiTri(Vector3f vertic, Vector3f L0, Vector3f L1, Vector3f L2){
+    Vector3f diff = vertic-L0;
+    Vector3f dir1 = L1-L0;
+	Vector3f dir2 = L2-L0;
+
+	float dot05 = dot(dir1,dir2);
+    float dot10 = dot(diff,dot05);
 	
-	dist = norm(n)/norm(v);
+    if (dot11 <= 0.0f || dot12 <= 0.0f)
+        return L0.Dist(vertic);
 
-	return dist;
-	/*
-	Vector3f v = L1 - L0;
-	Vector3f w = vertic - L0;
+	float dot21 = dot(dir1,dir1);
+    if (dot21 <= dot11 || dot21 <= dot12)
+        return L1.Dist(vertic);
+	float dot22 = dot(dir2,dir2);
+	if (dot22 <= dot11 || dot22 <= dot12)
+        return L2.Dist(vertic);
 
-	float c1 = dot(w,v);
-	if ( c1 <= 0 )
-		return vertic.Dist(L0);
+    float t1=dot11/dot21;
+	float t2=dot12/dot22;
+	return (L0 + dir1*t1 +dir2*t2).Dist(vertic);
 
-	float c2 = dot(v,v);
-	if ( c2 <= c1 )
-		return vertic.Dist(L1);
-
-	float b = c1 / c2;
-	Vector3f Pb = L0 + v * b;
-		return  d(vertic, Pb);
-	*/
+	
+	return -1;
 }

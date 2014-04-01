@@ -102,6 +102,8 @@ struct Vector3f{
 	
 	float Dist(Vector3f& v);
 
+	float Skalar(Vector3f& v);
+
     void Rotate(float Angle, const Vector3f& Axis);
 
     void Print() const
@@ -109,47 +111,6 @@ struct Vector3f{
         printf("(%.02f, %.02f, %.02f)\n", x, y, z);
     }
 };
-
-struct Vector4f{
-    float x;
-    float y;
-    float z;
-	float a;
-
-    Vector4f(){
-    }
-
-    Vector4f(float _x, float _y, float _z, float _a){
-        x = _x;
-        y = _y;
-        z = _z;
-		a = _a;
-    }
-	
-    Vector4f& operator+=(const Vector4f& _r){
-        x += _r.x;
-        y += _r.y;
-        z += _r.z;
-		a += _r.a;
-
-        return *this;
-    }
-
-    Vector4f& operator-=(const Vector4f& _r){
-        x -= _r.x;
-        y -= _r.y;
-        z -= _r.z;
-		a -= _r.a;
-
-        return *this;
-    }
-
-    void Print() const
-    {
-        printf("(%.02f, %.02f, %.02f, %.02f)\n", x, y, z, a);
-    }
-};
-
 
 inline Vector3f operator+(const Vector3f& l, const Vector3f& r)
 {
@@ -265,6 +226,7 @@ Quaternion operator*(const Quaternion& l, const Quaternion& r);
 Quaternion operator*(const Quaternion& q, const Vector3f& v);
 
 float calcDistPoiLin(Vector3f _vertic, Vector3f _L0, Vector3f L1);
+float calcDistPoiTri(Vector3f vertic, Vector3f L0, Vector3f L1, Vector3f L2);
 
 #endif	/* MATH_3D_H */
 

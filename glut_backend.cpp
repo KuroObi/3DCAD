@@ -66,7 +66,7 @@ static void InitCallbacks(){
 
 void GLUTBackendInit(int argc, char** argv){
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DEPTH|GLUT_RGBA|GLUT_DOUBLE);
+    glutInitDisplayMode(GLUT_DEPTH|GLUT_RGBA|GLUT_DOUBLE|GLUT_MULTISAMPLE); //GLUT_MULTISAMPLE -> Antialiasing
     glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 
 }

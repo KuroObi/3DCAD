@@ -22,71 +22,57 @@ static const char* pVS = "                                                      
 #version 330                                                                        \n\
                                                                                     \n\
 layout (location = 0) in vec3 Position;                                             \n\
-layout (location = 1) in vec4 Color;												\n\
+layout (location = 1) in vec3 Color;												\n\
                                                                                     \n\
 uniform mat4 gWVP;                                                                  \n\
 uniform int gui;																	\n\
 																					\n\
-out vec4 frag_color;																\n\
-                                                                                    \n\
+out vec3 V_Color;																	\n\
+																					\n\
 void main()                                                                         \n\
 {                                                                                   \n\
+	V_Color = Color;																\n\
 	switch (gui){																	\n\
 		case 0:																		\n\
 			gl_Position = gWVP * vec4(Position, 1.0);		                        \n\
-			frag_color = Color;														\n\
 			break;																	\n\
 		case 1:																		\n\
 			gl_Position = vec4(Position, 1.0);										\n\
-			frag_color = Color;														\n\
 			break;																	\n\
 	}																				\n\
 }";
 
-/*	
-
-
-
-next Step -> Textures
-static const char* pVS0 = "                                                         \n\
-#version 330                                                                        \n\
-                                                                                    \n\
-layout (location = 0) in vec3 Position;                                             \n\
-layout (location = 1) in vec2 TexCoord;                                             \n\
-                                                                                    \n\
-uniform mat4 gWVP;                                                                  \n\
-                                                                                    \n\
-out vec2 TexCoord0;                                                                 \n\
-                                                                                    \n\
-void main()                                                                         \n\
-{                                                                                   \n\
-    gl_Position = gWVP * vec4(Position, 1.0);                                       \n\
-    TexCoord0 = TexCoord;                                                           \n\
-}";
-*/
-
-static const char* pFS = "                                                          \n\
-#version 330                                                                        \n\
-                                                                                    \n\
-in vec4 frag_color;																	\n\
-                                                                                    \n\
-out vec4 out_color;																	\n\
-                                                                                    \n\
-struct DirectionalLight                                                             \n\
-{                                                                                   \n\
-    vec3 Color;                                                                     \n\
-    float AmbientIntensity;                                                         \n\
-};                                                                                  \n\
-                                                                                    \n\
+static const char* pFS = "															\n\
+#version 330																		\n\
+																					\n\
+in vec3 V_Color;																	\n\
+																					\n\
+out vec4 FragColor;																	\n\
+																					\n\
+struct DirectionalLight																\n\
+{																					\n\
+vec3 Color;																			\n\
+float AmbientIntensity;																\n\
+};																					\n\
+																					\n\
 uniform DirectionalLight gDirectionalLight;											\n\
-                                                                                    \n\
-void main()                                                                         \n\
-{                                                                                   \n\
-	out_color = frag_color *														\n\
-                vec4(gDirectionalLight.Color, 0.0f) *                               \n\
-                gDirectionalLight.AmbientIntensity;                                 \n\
+uniform int gui;																	\n\
+uniform sampler2D gSampler;                                                         \n\
+																					\n\
+void main()																			\n\
+{																					\n\
+	switch(gui){																	\n\
+		case 0:																		\n\
+			FragColor = vec4(V_Color, 1.0) *										\n\
+						vec4(gDirectionalLight.Color, 0.0f) *						\n\
+						gDirectionalLight.AmbientIntensity;							\n\
+			FragColor = vec4(V_Color, 1.0);					\n\
+			break;																	\n\
+		case 1:																		\n\
+			FragColor = texture(gSampler, V_Color.xy);								\n\
+			break;																	\n\
+	}																				\n\
 }";
-
 
 LightingTechnique::LightingTechnique(){ 
 }
@@ -111,18 +97,23 @@ bool LightingTechnique::Init(){
     }
 
     m_WVPLocation = GetUniformLocation("gWVP");
+	if(m_WVPLocation == 0xFFFFFFFF )
+		return false;
 	m_GUILocation = GetUniformLocation("gui");
+	if(m_GUILocation == 0xFFFFFFFF)
+		return false;
     m_dirLightColorLocation = GetUniformLocation("gDirectionalLight.Color");
+	if(m_dirLightColorLocation == 0xFFFFFFFF)
+		return false;
     m_dirLightAmbientIntensityLocation = GetUniformLocation("gDirectionalLight.AmbientIntensity");
-
-    if (m_dirLightAmbientIntensityLocation == 0xFFFFFFFF ||
-        m_WVPLocation == 0xFFFFFFFF ||
-        m_dirLightColorLocation == 0xFFFFFFFF||
-		//m_MVectorLocation == 0xFFFFFFFF||
-        m_GUILocation == 0xFFFFFFFF){
+	if(m_dirLightAmbientIntensityLocation == 0xFFFFFFFF)
+		return false;
+    m_samplerLocation = GetUniformLocation("gSampler");
+    if(m_samplerLocation == 0xFFFFFFFF)
         return false;
-    }
-
+		
+	glUniform1i(m_samplerLocation, 0);
+	
     return true;
 }
 
@@ -137,4 +128,8 @@ void LightingTechnique::SetDirectionalLight(const DirectionalLight& Light){
 
 void LightingTechnique::SetGUI(int _gui){
 	glUniform1i(m_GUILocation, _gui);
+}
+
+void LightingTechnique::SetTextureUnit(unsigned int TextureUnit)
+{
 }

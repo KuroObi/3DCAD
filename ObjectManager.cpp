@@ -18,6 +18,8 @@
 #include "ObjectManager.h"
 #include <GL/freeglut.h>
 
+#define grey Vector3f(0.3f, 0.3f, 0.3f)
+
 ObjectManager::ObjectManager(){
 	sector = World();
 	
@@ -31,27 +33,27 @@ void ObjectManager::generateCordinateSystem(){
 	Vector3f xA = Vector3f(1.0f, 0.0f, 0.0f);
 	Vector3f yA = Vector3f(0.0f, 1.0f, 0.0f);
 	Vector3f zA = Vector3f(0.0f, 0.0f, 1.0f);
-	Vector4f red = Vector4f(1.0f, 0.0f, 0.0f, 1.0f);
-	Vector4f green = Vector4f(0.0f, 0.8f, 0.0f, 1.0f);
-	Vector4f blue = Vector4f(0.0f, 0.0f, 1.0f, 1.0f);
+	Vector3f red = Vector3f(1.0f, 0.0f, 0.0f);
+	Vector3f green = Vector3f(0.0f, 0.8f, 0.0f);
+	Vector3f blue = Vector3f(0.0f, 0.0f, 1.0f);
 
-	genarateLine(center, xA, red);
-	genarateLine(xA, Vector3f(0.95f, 0.025f, 0.0f), red);
-	genarateLine(xA, Vector3f(0.95f, -0.025f, 0.0f), red);
+	genarateLine(center, xA, red, true);
+	genarateLine(xA, Vector3f(0.95f, 0.025f, 0.0f), red, true);
+	genarateLine(xA, Vector3f(0.95f, -0.025f, 0.0f), red, true);
 	
-	genarateLine(center, yA, blue);
-	genarateLine(yA, Vector3f(0.05f, 0.95f, -0.025f), blue);
-	genarateLine(yA, Vector3f(-0.05f, 0.95f, 0.025f), blue);
+	genarateLine(center, yA, blue, true);
+	genarateLine(yA, Vector3f(0.05f, 0.95f, -0.025f), blue, true);
+	genarateLine(yA, Vector3f(-0.05f, 0.95f, 0.025f), blue, true);
 	
-	genarateLine(center, zA, green);
-	genarateLine(zA, Vector3f(0.0f, 0.025f, 0.95f), green);
-	genarateLine(zA, Vector3f(0.0f, -0.025f, 0.95f), green);
+	genarateLine(center, zA, green, true);
+	genarateLine(zA, Vector3f(0.0f, 0.025f, 0.95f), green, true);
+	genarateLine(zA, Vector3f(0.0f, -0.025f, 0.95f), green, true);
 }
 
 void ObjectManager::genaratePoint(Vector3f _vertex0){	
 	Point * generatetPoint = new Point;
 
-	generatetPoint = new Point(_vertex0);
+	generatetPoint = new Point(_vertex0, grey);
 	sector.addPoint(generatetPoint);
 }
 void ObjectManager::deletePoint(Point * rmPoint){
@@ -61,14 +63,13 @@ void ObjectManager::deletePoint(Point * rmPoint){
 void ObjectManager::genarateLine(Vector3f _vertex0, Vector3f _vertex1){	
 	Line * generatetLine = new Line;
 
-	generatetLine = new Line(_vertex0, _vertex1);
+	generatetLine = new Line(_vertex0, _vertex1, grey, false);
 	sector.addLine(generatetLine);
 }
-
-void ObjectManager::genarateLine(Vector3f _vertex0, Vector3f _vertex1, Vector4f _color){	
+void ObjectManager::genarateLine(Vector3f _vertex0, Vector3f _vertex1, Vector3f _color, bool _protect){	
 	Line * generatetLine = new Line;
 
-	generatetLine = new Line(_vertex0, _vertex1, _color);
+	generatetLine = new Line(_vertex0, _vertex1, _color, _protect);
 	sector.addLine(generatetLine);
 }
 void ObjectManager::deleteLine(Line * rmLine){
@@ -76,12 +77,9 @@ void ObjectManager::deleteLine(Line * rmLine){
 }
 
 void ObjectManager::genarateTriangle(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex2){	
-	Triangle * generatedTriangle = new Triangle;
-
-	generatedTriangle = new Triangle(_vertex0, _vertex1, _vertex2);
-	sector.addTriangle(generatedTriangle);
+	genarateTriangle(_vertex0, _vertex1, _vertex2, grey);
 }
-void ObjectManager::genarateTriangle(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex2, Vector4f _color){	
+void ObjectManager::genarateTriangle(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex2, Vector3f _color){	
 	Triangle * generatedTriangle = new Triangle;
 
 	generatedTriangle = new Triangle(_vertex0, _vertex1, _vertex2, _color);
@@ -92,17 +90,9 @@ void ObjectManager::deleteTriangle(Triangle * rmTriangle){
 }
 
 void ObjectManager::genarateSquare(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex2){
-	Triangle * generatedTriangle1 = new Triangle;
-	Triangle * generatedTriangle2 = new Triangle;
-
-	generatedTriangle1 = new Triangle(_vertex0, _vertex1, _vertex2);
-	
-	generatedTriangle2 = new Triangle(_vertex0, _vertex0 - (_vertex1 - _vertex2), _vertex2);
-	
-	sector.addTriangle(generatedTriangle1);
-	sector.addTriangle(generatedTriangle2);
+	genarateSquare(_vertex0, _vertex1, _vertex2, grey);
 }
-void ObjectManager::genarateSquare(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex2, Vector4f _color){
+void ObjectManager::genarateSquare(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex2, Vector3f _color){
 	Triangle * generatedTriangle1 = new Triangle;
 	Triangle * generatedTriangle2 = new Triangle;
 

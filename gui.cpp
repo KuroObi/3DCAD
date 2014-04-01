@@ -20,30 +20,31 @@
 
 
 void gui::init(){
-	button[0] = Button(	Vector3f(-0.95f, 0.8f, 0.0f),
-						Vector3f(-0.8f, 0.95f, 0.0f),
+	button[0] = Button(	Vertex(Vector3f(-0.95f, 0.78f, 0.0f), Vector3f(0.0f, 0.667f, 1.0f)),
+						Vertex(Vector3f(-0.85f, 0.95f, 0.0f), Vector3f(0.333f, 1.0f, 1.0f)),
 						NEW);
-	
-	button[1] = Button(	Vector3f(0.92f, 0.9f, 0.0f),
-						Vector3f(0.95f, 0.95f, 0.0f),
+	button[1] = Button(	Vertex(Vector3f(0.92f, 0.9f, 0.0f), Vector3f(0.334f, 0.667f, 1.0f)),
+						Vertex(Vector3f(0.95f, 0.95f, 0.0f), Vector3f(0.666f, 1.0f, 1.0f)),
 						QUIT);
-
-	button[2] = Button(	Vector3f(0.9f, -0.95f, 0.0f),
-						Vector3f(0.95f, -0.9f, 0.0f),
+	button[2] = Button(	Vertex(Vector3f(0.9f, -0.95f, 0.0f), Vector3f(0.667f, 0.667f, 1.0f)),
+						Vertex(Vector3f(0.95f, -0.9f, 0.0f), Vector3f(1.0f, 1.0f, 1.0f)),
 						STEREO);
 
-	button[3] = Button(	Vector3f(-0.23f, -0.95f, 0.0f),
-						Vector3f(-0.13f, -0.85f, 0.0f),
+	button[3] = Button(	Vertex(Vector3f(-0.35f, -0.95f, 0.0f), Vector3f(0.0f, 0.334f, 1.0f)),
+						Vertex(Vector3f(-0.25f, -0.85f, 0.0f), Vector3f(0.333f, 0.666f, 1.0f)),
 						POI);
-	button[4] = Button( Vector3f(-0.11f, -0.95f, 0.0f),
-						Vector3f(-0.01f, -0.85f, 0.0f),
+	button[4] = Button( Vertex(Vector3f(-0.20f, -0.95f, 0.0f), Vector3f(0.334f, 0.334f, 1.0f)),
+						Vertex(Vector3f(-0.10f, -0.85f, 0.0f), Vector3f(0.666f, 0.666f, 1.0f)),
 						LINE);
-	button[5] = Button(	Vector3f(0.01f, -0.95f, 0.0f),
-						Vector3f(0.11f, -0.85f, 0.0f),
+	button[5] = Button(	Vertex(Vector3f(-0.05f, -0.95f, 0.0f), Vector3f(0.667f, 0.334f, 1.0f)),
+						Vertex(Vector3f(0.05f, -0.85f, 0.0f), Vector3f(1.0f, 0.666f, 1.0f)),
 						TRI);
-	button[6] = Button(	Vector3f(0.13f, -0.95f, 0.0f),
-						Vector3f(0.23f, -0.85f, 0.0f),
+	button[6] = Button(	Vertex(Vector3f(0.11f, -0.95f, 0.0f), Vector3f(0.0f, 0.0f, 1.0f)),
+						Vertex(Vector3f(0.20f, -0.85f, 0.0f), Vector3f(0.333f, 0.333f, 1.0f)),
 						QAD);
+	button[7] = Button(	Vertex(Vector3f(0.25f, -0.95f, 0.0f), Vector3f(0.334f, 0.0f, 1.0f)),
+						Vertex(Vector3f(0.35f, -0.85f, 0.0f), Vector3f(0.666f, 0.333f, 1.0f)),
+						REM);
 	
 }
 

@@ -23,19 +23,19 @@
 
 struct Vertex{
 	Vector3f xyz;
-	Vector4f rgba;
+	Vector3f rgb;
 	
 	Vertex(){
 	};
 
 	Vertex(Vector3f _Vertex){
 		xyz = _Vertex;
-		rgba = Vector4f(0.2f, 0.2f, 0.2f, 1.0f);
+		rgb = Vector3f(0.2f, 0.2f, 0.2f);
 	}
 	
-	Vertex(Vector3f _Vertex, Vector4f _Color){
+	Vertex(Vector3f _Vertex, Vector3f _Color){
 		xyz = _Vertex;
-		rgba = _Color;
+		rgb = _Color;
 	}
 
 	Vector3f getVector3f(){
@@ -63,9 +63,9 @@ struct Point : Obj{
 		beforePoint = NULL;
 	}
 
-	Point(Vector3f _vertex0, Vector4f _color){
+	Point(Vector3f _vertex0, Vector3f _color){
 		vertex[0].xyz = _vertex0;
-		vertex[0].rgba = _color;
+		vertex[0].rgb = _color;
 		nextPoint = NULL;
 		beforePoint = NULL;
 	}
@@ -76,11 +76,14 @@ struct Line{
 	Line * nextLine;
 	Line * beforeLine;
 
+	bool protect;
+
 	Line(){
 		vertex[0] = Vertex();
 		vertex[1] = Vertex();
 		nextLine = NULL;
 		beforeLine = NULL;
+		protect = false;
 	}
 
 	Line(Vector3f _vertex0, Vector3f _vertex1){
@@ -88,15 +91,17 @@ struct Line{
 		vertex[1] = _vertex1;
 		nextLine = NULL;
 		beforeLine = NULL;
+		protect = false;
 	}
 
-	Line(Vector3f _vertex0, Vector3f _vertex1, Vector4f _color){
+	Line(Vector3f _vertex0, Vector3f _vertex1, Vector3f _color, bool _protect){
 		vertex[0].xyz = _vertex0;
-		vertex[0].rgba = _color;
+		vertex[0].rgb = _color;
 		vertex[1].xyz = _vertex1;
-		vertex[1].rgba = _color;
+		vertex[1].rgb = _color;
 		nextLine = NULL;
 		beforeLine = NULL;
+		protect = _protect;
 	}
 };
 
@@ -121,13 +126,13 @@ struct Triangle{
 		beforeTriangle = NULL;
 	}
 
-	Triangle(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex2, Vector4f _color){
+	Triangle(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex2, Vector3f _color){
 		vertex[0].xyz = _vertex0;
-		vertex[0].rgba = _color;
+		vertex[0].rgb = _color;
 		vertex[1].xyz = _vertex1;
-		vertex[1].rgba =_color;
+		vertex[1].rgb =_color;
 		vertex[2].xyz = _vertex2;
-		vertex[2].rgba =_color;
+		vertex[2].rgb =_color;
 		nextTriangle = NULL;
 		beforeTriangle = NULL;	
 	}
@@ -177,7 +182,6 @@ struct World{
 			Point * newPoint = new Point;
 			HeadPoint = newPoint;
 		}else{		
-			rmPoint->vertex->xyz.Print();
 			if(rmPoint->beforePoint == NULL)
 				HeadPoint = rmPoint->nextPoint;
 			else
@@ -185,43 +189,44 @@ struct World{
 			if(rmPoint->nextPoint != NULL)
 				rmPoint->nextPoint->beforePoint = rmPoint->beforePoint;
 		}
-		delete &rmPoint;
+		delete rmPoint;
 		numberOfPoints--;
 		return;
 	};
 
 	void addLine(Line * newLine){
 		newLine->nextLine = HeadLine;
+		if(numberOfLines!= 0)
+			HeadLine->beforeLine = newLine;
+		else
+			newLine->nextLine = NULL;
+		newLine->beforeLine = NULL;
 		HeadLine = newLine;
 
 		numberOfLines++;
 		return;
 	};
 	void removeLine(Line * rmLine){
-		if(numberOfLines == 1){
-			Line * newLine = new Line;
-			HeadLine = newLine;
-		}else{		
-			rmLine->vertex->xyz.Print();
-			if(rmLine->beforeLine == NULL)
-				HeadLine = rmLine->nextLine;
-			else
-				rmLine->beforeLine->nextLine = rmLine->nextLine;
-			if(rmLine->nextLine != NULL)
-				rmLine->nextLine->beforeLine = rmLine->beforeLine;
-		}
-		delete &rmLine;
+		if(rmLine->beforeLine == NULL)
+			HeadLine = rmLine->nextLine;
+		else
+			rmLine->beforeLine->nextLine = rmLine->nextLine;
+		if(rmLine->nextLine != NULL)
+			rmLine->nextLine->beforeLine = rmLine->beforeLine;
+		delete rmLine;
 		numberOfLines--;
 		return;
 	};
 
 	void addTriangle(Triangle * newTriangle){
-		Triangle * nextTriangle = new Triangle;
-		
-		nextTriangle = newTriangle;
 		newTriangle->nextTriangle = HeadTriangle;
+		if(numberOfTriangles!= 0)
+			HeadTriangle->beforeTriangle = newTriangle;
+		else
+			newTriangle->nextTriangle = NULL;
+		newTriangle->beforeTriangle = NULL;
 		HeadTriangle = newTriangle;
-
+		
 		numberOfTriangles++;
 		return;
 	};
@@ -238,7 +243,7 @@ struct World{
 			if(rmTriangle->nextTriangle != NULL)
 				rmTriangle->nextTriangle->beforeTriangle = rmTriangle->beforeTriangle;
 		}
-		delete &rmTriangle;
+		delete rmTriangle;
 		numberOfTriangles--;
 		return;
 	};
@@ -255,19 +260,20 @@ public:
 	void generateCordinateSystem();
 
 	void genaratePoint(Vector3f _vertex0);
-	void genaratePoint(Vector3f _vertex0, Vector4f _color);
+	void genaratePoint(Vector3f _vertex0, Vector3f _color);
 	void deletePoint(Point * rmPoint);
 
 	void genarateLine(Vector3f _vertex0, Vector3f _vertex1);
-	void genarateLine(Vector3f _vertex0, Vector3f _vertex1, Vector4f _color);
+	void genarateLine(Vector3f _vertex0, Vector3f _vertex1, Vector3f _color);
+	void genarateLine(Vector3f _vertex0, Vector3f _vertex1, Vector3f _color, bool _protect);
 	void deleteLine(Line * rmLine);
 
 	void genarateTriangle(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex3);
-	void genarateTriangle(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex3, Vector4f _color);
+	void genarateTriangle(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex3, Vector3f _color);
 	void deleteTriangle(Triangle * rmTriangle);
 
 	void genarateSquare(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex3);
-	void genarateSquare(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex3, Vector4f _color);
+	void genarateSquare(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex3, Vector3f _color);
 
 	Vertex* getWorld();
 

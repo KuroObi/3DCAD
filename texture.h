@@ -1,5 +1,6 @@
 /*
-	Copyright 2013 Christoph Schabert
+
+	Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,42 +16,33 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef TEXTURE_H
+#define	TEXTURE_H
 
-#ifndef UI_H
-#define	UI_H
+#ifdef WIN32
+#include <Windows.h>
+#endif
 
-#include "math_3d.h"
-#include "ObjectManager.h"
+#include <string>
 
-enum drawType{
-	tPOINT = 1,
-	tLINE = 2,
-	tTRI = 3,
-	tSQUAR = 13,
-	tREMOVE = -1
+#include <GL/glew.h>
+#include <ImageMagick/Magick++.h>
+
+class Texture
+{
+public:
+    Texture(GLenum TextureTarget, const std::string& FileName);
+
+    bool Load();
+    void Bind(GLenum TextureUnit);
+
+private:
+    std::string m_fileName;
+    GLenum m_textureTarget;
+    GLuint m_textureObj;
+    Magick::Image* m_pImage;
+    Magick::Blob m_blob;
 };
 
 
-class UI{
-	public:
-		UI();
-
-		void changeDrawT(drawType _drawT);
-
-		void draw(Vector3f _vertic, ObjectManager * p_oManager);
-
-		void reset_vCount();
-
-
-	private:
-		drawType drawT;
-		Vector3f drawingV[3];
-		int	vCount;
-
-		Obj checkSourounding(Vector3f _vertic, World sector);
-
-};
-
-
-
-#endif	/* UI_H */
+#endif	/* TEXTURE_H */

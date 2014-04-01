@@ -38,83 +38,64 @@ Obj checkSourounding(Vector3f _vertic, World sector){
 	//}
 	return fPoint;
 }
+void UI::reset_vCount(){
+	vCount = 0;
+	return;
+}
 
 void UI::draw(Vector3f _vertic, ObjectManager * p_oManager){
-	
-	Obj * oj = new Obj;
 
 	if(drawT == tREMOVE){
+		vCount = 0;
 		float genauigkeit = 0.025f;	//change name and ajust value
-
+		
 		//Check for Point
 		if(p_oManager->sector.numberOfPoints > 0){
-			
 			Point * nP = new Point;
 			nP = p_oManager->sector.HeadPoint;
 
-			for(int cPoi = 0; cPoi < p_oManager->sector.numberOfPoints; cPoi++){
-				if(_vertic.z < nP->vertex->xyz.z+genauigkeit && _vertic.z > nP->vertex->xyz.z-genauigkeit){
-					if(_vertic.y < nP->vertex->xyz.y+genauigkeit && _vertic.y > nP->vertex->xyz.y-genauigkeit){
-						if(_vertic.x < nP->vertex->xyz.x+genauigkeit && _vertic.x > nP->vertex->xyz.x-genauigkeit){
-							p_oManager->sector.removePoint(nP);
-							return;
-						}
-					}
-				}
-				nP = nP->nextPoint;
+			for(int cPoi = 0; cPoi < p_oManager->sector.numberOfPoints; cPoi++, nP = nP->nextPoint){
+				if(_vertic.Dist(nP->vertex->getVector3f()) <= genauigkeit){
+					p_oManager->sector.removePoint(nP);
+					return;
+				}				
 			}
 		}
 		//Check for Line
-		if(p_oManager->sector.numberOfLines > 9){
-			
+		if(p_oManager->sector.numberOfLines >= 9){
 			Line * nL = new Line;
 			nL = p_oManager->sector.HeadLine;
 
-			for(int n = 0; n < 9; n++)
-				nL = nL->nextLine;
-
-			float dist;
-
-			for(int cLin = 9; cLin < p_oManager->sector.numberOfLines; cLin++){
-
-				dist = calcDistPoiLin(_vertic, nL->vertex[0].getVector3f(), nL->vertex[1].getVector3f());
-				printf("\ndist: %f", dist);
+			for(int cLin = 0; cLin < p_oManager->sector.numberOfLines; cLin++, nL = nL->nextLine){
+				if(nL->protect == true)
+					continue;
+				if(calcDistPoiLin(_vertic, nL->vertex[0].getVector3f(), nL->vertex[1].getVector3f()) <= genauigkeit){
+					p_oManager->sector.removeLine(nL);
+					return;
+				}
 				
-				/*
-				if(_vertic.z < nL->vertex->xyz.z+genauigkeit && _vertic.z > nL->vertex->xyz.z-genauigkeit){
-					if(_vertic.y < nL->vertex->xyz.y+genauigkeit && _vertic.y > nL->vertex->xyz.y-genauigkeit){
-						if(_vertic.x < nL->vertex->xyz.x+genauigkeit && _vertic.x > nL->vertex->xyz.x-genauigkeit){
-							nL->vertex->xyz.Print();
-							p_oManager->sector.removeLine(nL);
-							return;
-						}
-					}
-				}*/
-				nL = nL->nextLine;
 			}
 		}
+
 		//Check for Triangle
 		if(p_oManager->sector.numberOfTriangles > 0){
-			
+
 			Triangle * nT = new Triangle;
 			nT = p_oManager->sector.HeadTriangle;
 
-			for(int cTri = 0; cTri < p_oManager->sector.numberOfTriangles; cTri++){
-				if(_vertic.z < nT->vertex->xyz.z+genauigkeit && _vertic.z > nT->vertex->xyz.z-genauigkeit){
-					if(_vertic.y < nT->vertex->xyz.y+genauigkeit && _vertic.y > nT->vertex->xyz.y-genauigkeit){
-						if(_vertic.x < nT->vertex->xyz.x+genauigkeit && _vertic.x > nT->vertex->xyz.x-genauigkeit){
-							nT->vertex->xyz.Print();
-							p_oManager->sector.removeTriangle(nT);
-							return;
-						}
-					}
-				}
-				nT = nT->nextTriangle;
+			float dist;
+
+			for(int cTri = 0; cTri < p_oManager->sector.numberOfTriangles; cTri++, nT = nT->nextTriangle){
+				dist = calcDistPoiTri(_vertic, nT->vertex[0].getVector3f(), nT->vertex[1].getVector3f(), nT->vertex[2].getVector3f());
+				//printf("%f\n", dist);
+				//if(dist <= genauigkeit){
+				//	p_oManager->sector.removeTriangle(nT);
+				//	return;
+				//}
 			}
 		}
 	}
-		//oj = &checkSourounding(_vertic, p_oManager->sector);
-	//printf("%i", oj);
+
 
 	if(vCount <= 1 && _vertic.Dist(drawingV[vCount-1]) <= 0.05f){
 		return;
