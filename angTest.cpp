@@ -81,6 +81,8 @@ class AngTest : public ICallbacks{
 	
 			stereo = false;
 			turnAround = false;
+
+			m_gui.init();
 			initGUI();
 			
 			m_mousePos = Vector3f(0.0, 0.0, 1.0);
@@ -253,19 +255,15 @@ class AngTest : public ICallbacks{
 							exit(0);
 							break;
 						case '1':
-							m_UI.reset_vCount();
 							m_UI.changeDrawT(tPOINT);
 							break;
 						case '2':
-							m_UI.reset_vCount();
 							m_UI.changeDrawT(tLINE);
 							break;
 						case '3':
-							m_UI.reset_vCount();
 							m_UI.changeDrawT(tTRI);
 							break;
 						case '4':
-							m_UI.reset_vCount();
 							m_UI.changeDrawT(tSQUAR);
 							break;
 						case 's':
@@ -276,10 +274,10 @@ class AngTest : public ICallbacks{
 							}
 							break;
 						case 'r':
-							m_UI.reset_vCount();
 							m_UI.changeDrawT(tREMOVE);
 							break;
 					}
+			initGUI();
 		}
 
 		virtual void PassiveMouseCB(int x, int y){
@@ -365,6 +363,7 @@ class AngTest : public ICallbacks{
 							break;
 					}
 					
+					initGUI();
 					CreateVertexBuffer();
 					
 					return;
@@ -387,17 +386,30 @@ class AngTest : public ICallbacks{
 	private:
 
 		void initGUI(){
-			m_gui.init();
 			int numberOfButtons = m_gui.numOfButtons;
 			int sizeVertices = numberOfButtons* 4 * 12 * 2;
 			Vertex * guiVert;
 			guiVert = new Vertex[numberOfButtons * 4];
+
+			float selectedColor = 0.0f;
 			
 			for(int c = 0; c < numberOfButtons; c++){
 				guiVert[c*4 + 0] = m_gui.button[c].vertex[0];
 				guiVert[c*4 + 1] = m_gui.button[c].vertex[1];
 				guiVert[c*4 + 2] = m_gui.button[c].vertex[2];
 				guiVert[c*4 + 3] = m_gui.button[c].vertex[3];
+				
+				if(m_UI.getDrawT() == m_gui.button[c].bFunction){
+					if(m_UI.getDrawT() == tREMOVE){
+						selectedColor = 0.5f;
+					}else{
+						selectedColor = 1.0f;
+					}
+					guiVert[c*4 + 0].rgb.z = selectedColor;
+					guiVert[c*4 + 1].rgb.z = selectedColor;
+					guiVert[c*4 + 2].rgb.z = selectedColor;
+					guiVert[c*4 + 3].rgb.z = selectedColor;
+				}
 			}
 
 			glGenBuffers(1, &m_guiVBO);
@@ -628,7 +640,7 @@ int main(int argc, char** argv){
 
     GLUTBackendInit(argc, argv);
 
-	bool fullScreen = false;
+	bool fullScreen = true;
 
 	if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 60, fullScreen, "AngTest")){
         return 0x11;
@@ -636,16 +648,12 @@ int main(int argc, char** argv){
 
 	AngTest* aTest = new AngTest();
 
-
 	if (!aTest->Init()){
         return 0x12;
     }
 
-		prepareTexture(w,h,data);
-
-
+	prepareTexture(w,h,data);
 	//showAtt(); //just for showing off some pic data
-
 
 	aTest->Run();
 
@@ -653,4 +661,3 @@ int main(int argc, char** argv){
  
     return 0;
 }
-

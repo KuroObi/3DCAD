@@ -27,6 +27,7 @@ UI::UI(){
    }
 
 void UI::changeDrawT(drawType _drawT){
+	vCount = 0;
 	drawT = _drawT;
 }
 
@@ -179,10 +180,9 @@ void UI::reset_vCount(){
 void UI::draw(Vector3f _vertic, ObjectManager * p_oManager){
 
 	if(drawT == tREMOVE){
-		vCount = 0;
 		checkSourounding(_vertic, p_oManager, true);
+		return;
 	}
-
 
 	if(vCount <= 1 && _vertic.Dist(drawingV[vCount-1]) <= 0.05f){
 		return;

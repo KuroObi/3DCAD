@@ -24,30 +24,29 @@
 #include "ObjectManager.h"
 
 enum func{
-	NOTHING,
-	NEW,
-	QUIT,
-	STEREO,
-	POI,
-	LINE,
-	TRI,
-	QAD,
-	REM
+	NOTHING = 100,
+	NEW = 101,
+	QUIT = 102,
+	STEREO = 103,
+	POI = 1,
+	LINE = 2,
+	TRI = 3,
+	QAD = 13,
+	REM = -1
 };
 
 struct Button{
 	Vertex  vertex[4];
-	
 	func bFunction;
 
 	Button(){
 	}
 
-	Button(Vertex _vertex0, Vertex _vertex1, func _bFunction){
+	Button(Vertex _vertex0, Vertex _vertex1, func _bFunction){	
 		vertex[0] = _vertex0;
-		vertex[1] = Vertex(Vector3f(_vertex1.xyz.x,_vertex0.xyz.y,0),Vector3f(_vertex1.rgb.x, _vertex0.rgb.y, 1.0f));
+		vertex[1] = Vertex(Vector3f(_vertex1.xyz.x,_vertex0.xyz.y,0),Vector3f(_vertex1.rgb.x, _vertex0.rgb.y, 0.0f));
 		vertex[2] = _vertex1;
-		vertex[3] = Vertex(Vector3f(_vertex0.xyz.x,_vertex1.xyz.y,0),Vector3f(_vertex0.rgb.x, _vertex1.rgb.y, 1.0f));
+		vertex[3] = Vertex(Vector3f(_vertex0.xyz.x,_vertex1.xyz.y,0),Vector3f(_vertex0.rgb.x, _vertex1.rgb.y, 0.0f));
 
 		bFunction = _bFunction;
 	}

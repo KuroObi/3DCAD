@@ -66,11 +66,19 @@ void main()																			\n\
 			FragColor = vec4(V_Color, 1.0) *										\n\
 						vec4(gDirectionalLight.Color, 0.0f) *						\n\
 						gDirectionalLight.AmbientIntensity;							\n\
-			FragColor = vec4(V_Color, 1.0);					\n\
 			break;																	\n\
 		case 1:																		\n\
-			FragColor = texture(gSampler, V_Color.xy);								\n\
-			break;																	\n\
+			if(V_Color.z > 0.0f){													\n\
+				if(V_Color.z > 0.5f){												\n\
+					FragColor = texture(gSampler, V_Color.xy) *						\n\
+								vec4(0.8f, 0.8f, 1.0f, 1.0f);						\n\
+				}else{																\n\
+					FragColor = texture(gSampler, V_Color.xy) *						\n\
+								vec4(1.0f, 0.8f, 0.8f, 1.0f);						\n\
+				}																	\n\
+			}else{																	\n\
+				FragColor = texture(gSampler, V_Color.xy);							\n\
+			}																		\n\
 	}																				\n\
 }";
 

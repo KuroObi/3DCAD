@@ -43,7 +43,7 @@ float Vector3f::Dist(Vector3f& v){
 	return sqrtf( (x-v.x)*(x-v.x) + (y-v.y)*(y-v.y) + (z-v.z)*(z-v.z) );
 }
 float Vector3f::RelDist(Vector3f& v){
-	return ( (x-v.x)*(x-v.x) + (y-v.y)*(y-v.y) + (z-v.z)*(z-v.z) );
+	return (x-v.x)*(x-v.x) + (y-v.y)*(y-v.y) + (z-v.z)*(z-v.z);
 }
 
 
