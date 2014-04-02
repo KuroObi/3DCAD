@@ -410,15 +410,34 @@ class AngTest : public ICallbacks{
 										
 			Vertex * vcMouse;
 			vcMouse = new Vertex[6];
+			Vector3f mouseColor = Vector3f(0.95f, 0.95f, 0.95f);
+			Vector3f _mouseColor;
+			float nextDist = 0;
 
-			vcMouse[0] = Vertex(m_mousePos - Vector3f(0.05f,0.0f,0.0f) , Vector3f(1.0f, 1.0f, 1.0f));
-			vcMouse[1] = Vertex(m_mousePos - Vector3f(-0.05f,0.0f,0.0f), Vector3f(1.0f, 1.0f, 1.0f));
+			if(m_UI.getDrawT() == tREMOVE){
+				_mouseColor = Vector3f(0.0f, 1.0f, 1.0f);
+				nextDist = m_UI.checkSourounding(m_mousePos, &m_oManager, false);
+				//printf("%f\n", nextDist);
+			}else{
+				_mouseColor = Vector3f(1.0f, 1.0f, 0.0f);
+				nextDist = m_UI.checkVertex(m_mousePos, &m_oManager, false);
+			}
+			//mouseColor.Print();
 
-			vcMouse[2] = Vertex(m_mousePos - Vector3f(0.0f,0.05f,0.0f) , Vector3f(1.0f, 1.0f, 1.0f));
-			vcMouse[3] = Vertex(m_mousePos - Vector3f(0.0f,-0.05f,0.0f), Vector3f(1.0f, 1.0f, 1.0f));
+			if(nextDist != 0){
+				mouseColor -= (_mouseColor*(1-nextDist));
+			}
+			//mouseColor.Print();
+			
 
-			vcMouse[4] = Vertex(m_mousePos - Vector3f(0.0f,0.0f,0.05f) , Vector3f(1.0f, 1.0f, 1.0f));
-			vcMouse[5] = Vertex(m_mousePos - Vector3f(0.0f,0.0f,-0.05f), Vector3f(1.0f, 1.0f, 1.0f));
+			vcMouse[0] = Vertex(m_mousePos - Vector3f(0.05f,0.0f,0.0f) , mouseColor);
+			vcMouse[1] = Vertex(m_mousePos - Vector3f(-0.05f,0.0f,0.0f), mouseColor);
+
+			vcMouse[2] = Vertex(m_mousePos - Vector3f(0.0f,0.05f,0.0f) , mouseColor);
+			vcMouse[3] = Vertex(m_mousePos - Vector3f(0.0f,-0.05f,0.0f), mouseColor);
+
+			vcMouse[4] = Vertex(m_mousePos - Vector3f(0.0f,0.0f,0.05f) , mouseColor);
+			vcMouse[5] = Vertex(m_mousePos - Vector3f(0.0f,0.0f,-0.05f), mouseColor);
 
 			glGenBuffers(1, &m_mouseVBO);
 			glBindBuffer(GL_ARRAY_BUFFER, m_mouseVBO);
@@ -449,7 +468,6 @@ class AngTest : public ICallbacks{
 			for(int cLi = 0; cLi < numLi; cLi++){
 				for(int cThisVertice = 0; cThisVertice < 2; cThisVertice++, cVertes++){
 					Vertices[cVertes] = thisLine->vertex[cThisVertice];
-					printf("\n%f	%f	%f", Vertices[cVertes].rgb.x, Vertices[cVertes].rgb.y, Vertices[cVertes].rgb.z);
 				}
 				if(thisLine->nextLine == NULL){
 					break;

@@ -101,6 +101,7 @@ struct Vector3f{
     Vector3f& Normalize();
 	
 	float Dist(Vector3f& v);
+	float RelDist(Vector3f& v);
 
 	float Skalar(Vector3f& v);
 

@@ -42,6 +42,9 @@ Vector3f& Vector3f::Normalize(){
 float Vector3f::Dist(Vector3f& v){
 	return sqrtf( (x-v.x)*(x-v.x) + (y-v.y)*(y-v.y) + (z-v.z)*(z-v.z) );
 }
+float Vector3f::RelDist(Vector3f& v){
+	return ( (x-v.x)*(x-v.x) + (y-v.y)*(y-v.y) + (z-v.z)*(z-v.z) );
+}
 
 
 void Vector3f::Rotate(float Angle, const Vector3f& Axe){
@@ -191,27 +194,10 @@ float calcDistPoiLin(Vector3f vertic, Vector3f L0, Vector3f L1){
 }
 
 float calcDistPoiTri(Vector3f vertic, Vector3f L0, Vector3f L1, Vector3f L2){
-    Vector3f diff = vertic-L0;
-    Vector3f dir1 = L1-L0;
-	Vector3f dir2 = L2-L0;
-
-	float dot05 = dot(dir1,dir2);
-    float dot10 = dot(diff,dot05);
-	
-    if (dot11 <= 0.0f || dot12 <= 0.0f)
-        return L0.Dist(vertic);
-
-	float dot21 = dot(dir1,dir1);
-    if (dot21 <= dot11 || dot21 <= dot12)
-        return L1.Dist(vertic);
-	float dot22 = dot(dir2,dir2);
-	if (dot22 <= dot11 || dot22 <= dot12)
-        return L2.Dist(vertic);
-
-    float t1=dot11/dot21;
-	float t2=dot12/dot22;
-	return (L0 + dir1*t1 +dir2*t2).Dist(vertic);
-
-	
-	return -1;
+    /*	Grobe aber schnelle annäherung
+	 *
+	 */
+	float a = (L0.Dist(vertic))+(L1.Dist(vertic))+(L2.Dist(vertic));
+	float b = (L0.Dist(L1))+(L1.Dist(L2))+(L2.Dist(L0));
+	return a-b;
 }

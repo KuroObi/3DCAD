@@ -41,14 +41,19 @@ class UI{
 
 		void reset_vCount();
 
+		float checkSourounding(Vector3f _vertic, ObjectManager * p_oManager, bool del);
+		float checkVertex(Vector3f _vertic, ObjectManager * p_oManager, bool place);
+
+		drawType getDrawT();
 
 	private:
 		drawType drawT;
 		Vector3f drawingV[3];
+		
 		int	vCount;
+		float genauigkeit;
 
-		Obj checkSourounding(Vector3f _vertic, World sector);
-
+		Vertex nextVertex;
 };
 
 
