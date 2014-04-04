@@ -91,13 +91,13 @@ float UI::checkSourounding(Vector3f _vertic, ObjectManager * p_oManager, bool de
 
 			for(int cTri = 0; cTri < p_oManager->sector.numberOfTriangles; cTri++, nT = nT->nextTriangle){
 				dist = calcDistPoiTri(_vertic, nT->vertex[0].getVector3f(), nT->vertex[1].getVector3f(), nT->vertex[2].getVector3f());
-				printf("%f\n", dist);
-				if(dist <= genauigkeit*10){
+				//printf("%f\n", dist);
+				if(dist <= genauigkeit){
 					if(del){
 						p_oManager->sector.removeTriangle(nT);
 						return 1;
 					}else{
-						return dist/(genauigkeit*10);
+						return dist/genauigkeit;
 					}
 				}
 			}

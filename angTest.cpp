@@ -640,7 +640,7 @@ int main(int argc, char** argv){
 
     GLUTBackendInit(argc, argv);
 
-	bool fullScreen = true;
+	bool fullScreen = false;
 
 	if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 60, fullScreen, "AngTest")){
         return 0x11;

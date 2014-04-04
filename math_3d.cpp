@@ -177,27 +177,41 @@ Quaternion operator*(const Quaternion& q, const Vector3f& v){
     return ret;
 }
 
-
-float calcDistPoiLin(Vector3f vertic, Vector3f L0, Vector3f L1){
-    Vector3f diff = vertic-L0;
+Vector3f nearPoi(Vector3f vertic, Vector3f L0, Vector3f L1){
+	Vector3f diff = vertic-L0;
     Vector3f dir = L1-L0;
     float dot1 = dot(diff,dir);
-    if (dot1 <= 0.0f)
-        return L0.Dist(vertic);
+    if(dot1 <= 0.0f)
+        return L0;
 
 	float dot2 = dot(dir,dir);
-    if (dot2 <= dot1)
-        return L1.Dist(vertic);
+    if(dot2 <= dot1)
+        return L1;
 
     float t=dot1/dot2;
-	return (L0 + dir*t).Dist(vertic);
+	return (L0 + dir*t);
+}
+
+float calcDistPoiLin(Vector3f vertic, Vector3f L0, Vector3f L1){
+
+	return nearPoi(vertic,L0,L1).Dist(vertic);
 }
 
 float calcDistPoiTri(Vector3f vertic, Vector3f L0, Vector3f L1, Vector3f L2){
-    /*	Grobe aber schnelle annäherung
-	 *
+	/*	
+	 *	Grobe aber schnelle Annäherung
 	 */
-	float a = (L0.Dist(vertic))+(L1.Dist(vertic))+(L2.Dist(vertic));
-	float b = (L0.Dist(L1))+(L1.Dist(L2))+(L2.Dist(L0));
-	return a-b;
+	Vector3f s = (L0 + L1 + L2)*(1.0f/3.0f);
+
+	Vector3f s1 = ((L1 - L0)*0.5f + L0);
+	Vector3f s2 = ((L2 - L0)*0.5f + L0);
+
+	float l1 = s.Dist(s1)/1.25f;
+	float l2 = s.Dist(s2)/1.25f;
+
+
+	if(l1 >= l2)
+		return s.Dist(vertic)-l1;
+	else
+		return s.Dist(vertic)-l2;
 }
