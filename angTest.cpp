@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
+#include <windows.h>
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
@@ -25,7 +25,6 @@
 #include <gl\gl.h>			// Header File For The OpenGL32 Library
 #include <gl\glu.h>			// Header File For The GLu32 Library
 #include <IL\il.h>
-//#include <IL/il.h>			//DevIl lib
 
 #include "pipeline.h"
 #include "camera.h"
@@ -74,11 +73,9 @@ class AngTest : public ICallbacks{
 			if (!m_pEffect->Init()){
 				return false;
 			}
-
+			
 			m_pEffect->Enable();
 
-			m_pEffect->SetTextureUnit(0);
-	
 			stereo = false;
 			turnAround = false;
 
@@ -89,17 +86,8 @@ class AngTest : public ICallbacks{
 			m_mouse2DPos = Vector2f(0.0f, 0.0f);
 			m_horoptor = 1.1f;
 			m_horoptorStep = 0.05f;
-
-			initMouse();
 			
-			/*
-
-	        GLuint Texture = loadBMP_custom("vtr.bmp");
-       
-	        // Get a handle for our "myTextureSampler" uniform
-		    GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
-			*/
-		
+			initMouse();
 
 			return true;
 		}
@@ -113,7 +101,7 @@ class AngTest : public ICallbacks{
 			
 			m_pEffect->SetGUI(0);
 			RenderPhase();
-			MousePhase(); 
+			//MousePhase(); 
 
 			glDisable(GL_DEPTH_TEST);			//Disable 3D-Things
 			
@@ -124,41 +112,22 @@ class AngTest : public ICallbacks{
 		
 			glutSwapBuffers();
 		}
-
+/*
 		void MousePhase(){
 			
 			glEnableVertexAttribArray(0);
 			glEnableVertexAttribArray(1);
-			/*
-			if(stereo == true){
-				glColorMask(GL_FALSE,GL_TRUE,GL_TRUE,GL_TRUE);
-			}
-			*/
+
 			glBindBuffer(GL_ARRAY_BUFFER, m_mouseVBO);
 
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
 			glDrawArrays(GL_LINES, 0, 6);
 			
-			/*
-			if(stereo == true){
-				m_pGameCamera->leftEye(horoptor);
-				glColorMask(GL_TRUE,GL_FALSE,GL_FALSE,GL_FALSE);
-
-				glDrawArrays(GL_LINES, 0, 6);
-			
-				glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
-			}
-			*/
 			glDisableVertexAttribArray(0);		
 			glDisableVertexAttribArray(1);
-			/*
-			if(stereo == true){
-				m_pGameCamera->rightEye(horoptor);
-			}
-			*/
 		}
-
+*/
 		void GuiPhase(){
 
 			glEnableVertexAttribArray(0);
@@ -292,7 +261,7 @@ class AngTest : public ICallbacks{
 			float relativ_y = (((float)y)/((float)WINDOW_HEIGHT) - 0.5f) * -2.0f;
 			m_mouse2DPos = Vector2f(relativ_x, relativ_y);
 			calcWorldPos();
-			initMouse();
+			refreshMouse();
 		}
 
 		virtual void MouseCB(int Button, int State, int x, int y){
@@ -314,7 +283,7 @@ class AngTest : public ICallbacks{
 					}
 
 					calcWorldPos();
-					initMouse();
+					refreshMouse();
 					
 					return;
 				}
@@ -419,9 +388,10 @@ class AngTest : public ICallbacks{
 		}
 
 		void initMouse(){
-										
-			Vertex * vcMouse;
-			vcMouse = new Vertex[6];
+			m_oManager.generateMouse(m_mousePos, Vector3f(0.95f, 0.95f, 0.95f));
+		}
+
+		void refreshMouse(){
 			Vector3f mouseColor = Vector3f(0.95f, 0.95f, 0.95f);
 			Vector3f _mouseColor;
 			float nextDist = 0;
@@ -429,31 +399,18 @@ class AngTest : public ICallbacks{
 			if(m_UI.getDrawT() == tREMOVE){
 				_mouseColor = Vector3f(0.0f, 1.0f, 1.0f);
 				nextDist = m_UI.checkSourounding(m_mousePos, &m_oManager, false);
-				//printf("%f\n", nextDist);
 			}else{
 				_mouseColor = Vector3f(1.0f, 1.0f, 0.0f);
 				nextDist = m_UI.checkVertex(m_mousePos, &m_oManager, false);
 			}
-			//mouseColor.Print();
 
 			if(nextDist != 0){
 				mouseColor -= (_mouseColor*(1-nextDist));
 			}
-			//mouseColor.Print();
 			
 
-			vcMouse[0] = Vertex(m_mousePos - Vector3f(0.05f,0.0f,0.0f) , mouseColor);
-			vcMouse[1] = Vertex(m_mousePos - Vector3f(-0.05f,0.0f,0.0f), mouseColor);
-
-			vcMouse[2] = Vertex(m_mousePos - Vector3f(0.0f,0.05f,0.0f) , mouseColor);
-			vcMouse[3] = Vertex(m_mousePos - Vector3f(0.0f,-0.05f,0.0f), mouseColor);
-
-			vcMouse[4] = Vertex(m_mousePos - Vector3f(0.0f,0.0f,0.05f) , mouseColor);
-			vcMouse[5] = Vertex(m_mousePos - Vector3f(0.0f,0.0f,-0.05f), mouseColor);
-
-			glGenBuffers(1, &m_mouseVBO);
-			glBindBuffer(GL_ARRAY_BUFFER, m_mouseVBO);
-			glBufferData(GL_ARRAY_BUFFER, 2 * 6 * 12, vcMouse, GL_DYNAMIC_DRAW);
+			m_oManager.refMouse(m_mousePos, mouseColor);
+			CreateVertexBuffer();
 		}
 
 		void CreateVertexBuffer(){
@@ -505,9 +462,8 @@ class AngTest : public ICallbacks{
 	//Variables
 	    GLuint m_VBO;
 		GLuint m_guiVBO;
-		GLuint m_mouseVBO;
+		//GLuint m_mouseVBO;
 
-		GLuint m_IBO;
 		LightingTechnique* m_pEffect;
         Camera* m_pGameCamera;
 		float m_scale;
@@ -522,6 +478,8 @@ class AngTest : public ICallbacks{
 		float eyeStep;
 		float m_horoptor;
 		float m_horoptorStep;
+
+		Line* vcMouse[3];
 
 		bool stereo;
 		bool turnAround;
@@ -623,41 +581,49 @@ printf(" Data type:  %s", s.c_str());
 
 int main(int argc, char** argv){
 
+	printf("START\n");
+
 	int w,h,id;
 	unsigned char* data;
 
+	printf("STAGE LoadImage\n");
 	// load image first so that window opens with image size
-	id = ilLoadImage("textures.jpg");	//("test.png");
+	id = ilLoadImage("textures.jpg");
 	// image not loaded
 	if (id == 0)
 		return(2);
+	
+	printf("STAGE BindImage\n");
 
 	ilBindImage(id);
 	w = ilGetInteger(IL_IMAGE_WIDTH);
 	h = ilGetInteger(IL_IMAGE_HEIGHT);
 	data = ilGetData();
 	
-
+	printf("STAGE GLUT 1/2\n");
     GLUTBackendInit(argc, argv);
 
-	bool fullScreen = false;
-
+	bool fullScreen = true;
+	printf("STAGE GLUT 2/2\n");
 	if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 60, fullScreen, "AngTest")){
         return 0x11;
     }
-
+	printf("STAGE AngTest\n");
 	AngTest* aTest = new AngTest();
 
+	printf("STAGE Init\n");
 	if (!aTest->Init()){
         return 0x12;
     }
 
 	prepareTexture(w,h,data);
 	//showAtt(); //just for showing off some pic data
-
+	printf("STAGE Run\n");
 	aTest->Run();
 
+	printf("STAGE delete\n");
     delete aTest;
  
+	printf("STOP\n");
     return 0;
 }

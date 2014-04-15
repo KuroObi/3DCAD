@@ -18,23 +18,23 @@
 
 #include "lighting_technique.h"
 
-static const char* pVS = "                                                          \n\
-#version 330                                                                        \n\
-                                                                                    \n\
-layout (location = 0) in vec3 Position;                                             \n\
-layout (location = 1) in vec3 Color;												\n\
-                                                                                    \n\
-uniform mat4 gWVP;                                                                  \n\
+static const char* pVS = "															\n\
+#version 330																		\n\
+																					\n\
+layout(location = 0) in vec3 Position;												\n\
+layout(location = 1) in vec3 Color;													\n\
+																					\n\
+uniform mat4 gWVP;																	\n\
 uniform int gui;																	\n\
 																					\n\
 out vec3 V_Color;																	\n\
 																					\n\
-void main()                                                                         \n\
-{                                                                                   \n\
+void main()																			\n\
+{																					\n\
 	V_Color = Color;																\n\
 	switch (gui){																	\n\
 		case 0:																		\n\
-			gl_Position = gWVP * vec4(Position, 1.0);		                        \n\
+			gl_Position = gWVP * vec4(Position, 1.0);								\n\
 			break;																	\n\
 		case 1:																		\n\
 			gl_Position = vec4(Position, 1.0);										\n\
@@ -51,13 +51,13 @@ out vec4 FragColor;																	\n\
 																					\n\
 struct DirectionalLight																\n\
 {																					\n\
-vec3 Color;																			\n\
-float AmbientIntensity;																\n\
+	vec3 Color;																		\n\
+	float AmbientIntensity;															\n\
 };																					\n\
 																					\n\
 uniform DirectionalLight gDirectionalLight;											\n\
 uniform int gui;																	\n\
-uniform sampler2D gSampler;                                                         \n\
+uniform sampler2D gSampler;															\n\
 																					\n\
 void main()																			\n\
 {																					\n\

@@ -50,6 +50,25 @@ void ObjectManager::generateCordinateSystem(){
 	genarateLine(zA, Vector3f(0.0f, -0.025f, 0.95f), green, true);
 }
 
+void ObjectManager::generateMouse(Vector3f _vertex0, Vector3f _color){
+	sector.mouse[0] = genarateLine(_vertex0 - Vector3f(0.05f,0.0f,0.0f),_vertex0 - Vector3f(-0.05f,0.0f,0.0f), _color,true);
+	sector.mouse[1] = genarateLine(_vertex0 - Vector3f(0.0f,0.05f,0.0f),_vertex0 - Vector3f(0.0f,-0.05f,0.0f), _color,true);
+	sector.mouse[2] = genarateLine(_vertex0 - Vector3f(0.0f,0.0f,0.05f),_vertex0 - Vector3f(0.0f,0.0f,-0.05f), _color,true);
+	return;
+}
+void ObjectManager::refMouse(Vector3f _vertex0, Vector3f _color){
+	sector.mouse[0]->vertex[0] = Vertex(_vertex0 - Vector3f(0.05f,0.0f,0.0f), _color);
+	sector.mouse[0]->vertex[1] = Vertex(_vertex0 - Vector3f(-0.05f,0.0f,0.0f), _color);
+	
+	sector.mouse[1]->vertex[0] = Vertex(_vertex0 - Vector3f(0.0f,0.05f,0.0f), _color);
+	sector.mouse[1]->vertex[1] = Vertex(_vertex0 - Vector3f(0.0f,-0.05f,0.0f), _color);
+	
+	sector.mouse[2]->vertex[0] = Vertex(_vertex0 - Vector3f(0.0f,0.0f,0.05f), _color);
+	sector.mouse[2]->vertex[1] = Vertex(_vertex0 - Vector3f(0.0f,0.0f,-0.05f), _color);
+	
+	return;
+}
+
 void ObjectManager::genaratePoint(Vector3f _vertex0){	
 	Point * generatetPoint = new Point;
 
@@ -66,11 +85,11 @@ void ObjectManager::genarateLine(Vector3f _vertex0, Vector3f _vertex1){
 	generatetLine = new Line(_vertex0, _vertex1, grey, false);
 	sector.addLine(generatetLine);
 }
-void ObjectManager::genarateLine(Vector3f _vertex0, Vector3f _vertex1, Vector3f _color, bool _protect){	
+Line* ObjectManager::genarateLine(Vector3f _vertex0, Vector3f _vertex1, Vector3f _color, bool _protect){	
 	Line * generatetLine = new Line;
 
 	generatetLine = new Line(_vertex0, _vertex1, _color, _protect);
-	sector.addLine(generatetLine);
+	return sector.addLine(generatetLine);
 }
 void ObjectManager::deleteLine(Line * rmLine){
 	sector.removeLine(rmLine);

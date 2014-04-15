@@ -113,7 +113,6 @@ float UI::checkVertex(Vector3f _vertic, ObjectManager * p_oManager, bool place){
 			nP = p_oManager->sector.HeadPoint;
 			for(int cPoi = 0; cPoi < p_oManager->sector.numberOfPoints; cPoi++, nP = nP->nextPoint){
 				dist = _vertic.RelDist(nP->vertex->getVector3f());
-				printf("%f	%f\n", dist, genauigkeit*genauigkeit);
 				if(dist <= genauigkeit){
 					if(place){
 						nextVertex = nP->vertex->getVector3f();

@@ -151,6 +151,8 @@ struct World{
 	Triangle* HeadTriangle;
 	Triangle startTriangle; 
 
+	Line* mouse[3];
+
 	World(){
 		numberOfPoints = 0;
 		startPoint = Point();
@@ -164,7 +166,7 @@ struct World{
 		startTriangle = Triangle();
 		HeadTriangle = &startTriangle;
 	}
-
+	
 	void addPoint(Point * newPoint){	
 		newPoint->nextPoint = HeadPoint;
 		if(numberOfPoints != 0)
@@ -194,7 +196,7 @@ struct World{
 		return;
 	};
 
-	void addLine(Line * newLine){
+	Line* addLine(Line * newLine){
 		newLine->nextLine = HeadLine;
 		if(numberOfLines!= 0)
 			HeadLine->beforeLine = newLine;
@@ -204,7 +206,7 @@ struct World{
 		HeadLine = newLine;
 
 		numberOfLines++;
-		return;
+		return newLine;
 	};
 	void removeLine(Line * rmLine){
 		if(rmLine->beforeLine == NULL)
@@ -259,13 +261,16 @@ public:
 
 	void generateCordinateSystem();
 
+	void generateMouse(Vector3f _vertex0, Vector3f _color);
+	void refMouse(Vector3f _vertex0, Vector3f _color);
+
 	void genaratePoint(Vector3f _vertex0);
 	void genaratePoint(Vector3f _vertex0, Vector3f _color);
 	void deletePoint(Point * rmPoint);
 
 	void genarateLine(Vector3f _vertex0, Vector3f _vertex1);
 	void genarateLine(Vector3f _vertex0, Vector3f _vertex1, Vector3f _color);
-	void genarateLine(Vector3f _vertex0, Vector3f _vertex1, Vector3f _color, bool _protect);
+	Line* genarateLine(Vector3f _vertex0, Vector3f _vertex1, Vector3f _color, bool _protect);
 	void deleteLine(Line * rmLine);
 
 	void genarateTriangle(Vector3f _vertex0, Vector3f _vertex1, Vector3f _vertex3);

@@ -93,7 +93,8 @@ bool GLUTBackendCreateWindow(unsigned int Width, unsigned int Height, unsigned i
         fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
         return false;
     }
-	printf("%s",glutLayerGet(GLUT_OVERLAY_POSSIBLE));
+	glutLayerGet(GLUT_OVERLAY_POSSIBLE);
+	//printf("%s",glutLayerGet(GLUT_OVERLAY_POSSIBLE));
 	glutEstablishOverlay();
     return true;
 }
