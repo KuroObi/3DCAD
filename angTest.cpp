@@ -60,7 +60,7 @@ class AngTest : public ICallbacks{
 			Vector3f Target(0.0f, -0.2f, 1.0f);
 			Vector3f Up(0.0, 0.0f, 0.0f);
 
-			eyeStep = 0.1f;
+			eyeStep = 0.02f;
 
 			worldPos = Vector3f(0.0f, 0.0f, 3.0f);
 			m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, eyeStep);
@@ -219,6 +219,8 @@ class AngTest : public ICallbacks{
 						case 'n':
 							m_oManager = ObjectManager();
 							m_UI = UI();
+							m_gui.init();
+							initGUI();
 							break;
 						case 'q':
 							exit(0);
@@ -300,6 +302,8 @@ class AngTest : public ICallbacks{
 						case NEW:
 							m_oManager = ObjectManager();
 							m_UI = UI();
+							m_gui.init();
+							initGUI();
 							break;
 						case QUIT:
 							exit(0);

@@ -57,14 +57,14 @@ void ObjectManager::generateMouse(Vector3f _vertex0, Vector3f _color){
 	return;
 }
 void ObjectManager::refMouse(Vector3f _vertex0, Vector3f _color){
-	sector.mouse[0]->vertex[0] = Vertex(_vertex0 - Vector3f(0.05f,0.0f,0.0f), _color);
-	sector.mouse[0]->vertex[1] = Vertex(_vertex0 - Vector3f(-0.05f,0.0f,0.0f), _color);
+	sector.mouse[0]->vertex[0] = Vertex(_vertex0 - Vector3f(100.0f,0.0f,0.0f), _color);
+	sector.mouse[0]->vertex[1] = Vertex(_vertex0 - Vector3f(-100.0f,0.0f,0.0f), _color);
 	
-	sector.mouse[1]->vertex[0] = Vertex(_vertex0 - Vector3f(0.0f,0.05f,0.0f), _color);
-	sector.mouse[1]->vertex[1] = Vertex(_vertex0 - Vector3f(0.0f,-0.05f,0.0f), _color);
+	sector.mouse[1]->vertex[0] = Vertex(_vertex0 - Vector3f(0.0f,100.0f,0.0f), _color);
+	sector.mouse[1]->vertex[1] = Vertex(_vertex0 - Vector3f(0.0f,-100.0f,0.0f), _color);
 	
-	sector.mouse[2]->vertex[0] = Vertex(_vertex0 - Vector3f(0.0f,0.0f,0.05f), _color);
-	sector.mouse[2]->vertex[1] = Vertex(_vertex0 - Vector3f(0.0f,0.0f,-0.05f), _color);
+	sector.mouse[2]->vertex[0] = Vertex(_vertex0 - Vector3f(0.0f,0.0f,100.0f), _color);
+	sector.mouse[2]->vertex[1] = Vertex(_vertex0 - Vector3f(0.0f,0.0f,-100.0f), _color);
 	
 	return;
 }

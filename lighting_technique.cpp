@@ -34,10 +34,10 @@ void main()																			\n\
 	V_Color = Color;																\n\
 	switch (gui){																	\n\
 		case 0:																		\n\
-			gl_Position = gWVP * vec4(Position, 1.0);								\n\
+			gl_Position = gWVP * vec4(Position, 1.0f);								\n\
 			break;																	\n\
 		case 1:																		\n\
-			gl_Position = vec4(Position, 1.0);										\n\
+			gl_Position = vec4(Position, 1.0f);										\n\
 			break;																	\n\
 	}																				\n\
 }";
@@ -63,7 +63,7 @@ void main()																			\n\
 {																					\n\
 	switch(gui){																	\n\
 		case 0:																		\n\
-			FragColor = vec4(V_Color, 1.0) *										\n\
+			FragColor = vec4(V_Color, 1.0f) *										\n\
 						vec4(gDirectionalLight.Color, 0.0f) *						\n\
 						gDirectionalLight.AmbientIntensity;							\n\
 			break;																	\n\
